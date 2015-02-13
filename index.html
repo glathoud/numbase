@@ -1,0 +1,177 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>numbase</title>
+    <script type="text/javascript" src="yak.js"></script>
+    <script type="text/javascript" src="numbase.js"></script>
+    <link rel="stylesheet" type="text/css" href="numbase.css">
+  </head>
+  <body>
+
+    <script type="text/yak.js">
+function () 
+{
+    var third_base_link = { "a href='http://web.williams.edu/Mathematics/sjmiller/public_html/105Sp10/addcomments/Hayes_ThirdBase.htm'" : "Third Base" }
+    , balanced_ternary_number_string = '_101_1'
+    , balanced_ternary_number_html = ynh( balanced_ternary_number_string )
+    ,         example_1 = 'numbase.parseInt( "' + balanced_ternary_number_string + '", "b3" )'
+
+    , balanced_ternary_float_string     = 'b3:_10.1_1'
+    , balanced_ternary_exp              = '1_10'
+    , balanced_ternary_float_string_exp = 'b3:_10.1_1:' + balanced_ternary_exp
+    ,                example_2 = 'numbase.parse( "' + balanced_ternary_float_string_exp + '" )'
+
+    , decimal_value = -25
+    , convert_to_balanced_ternary_string = 'numbase.str( ' + decimal_value + ', "b3" )'
+    ;
+
+    return [
+
+        { p : [ 
+
+            '['
+            , { 'a href=".."' : 'home' }
+            , ']'
+            
+            , '['
+            , { 'a href="http://github.com/glathoud/js.yak"' : 'GitHub repository for numbase' }
+            , ']'
+        ] }
+
+        , { h1 : "numbase" }
+        
+        , { p : [ 
+            "Inspired by "
+            , third_base_link
+            , ", a column from Brian Hayes published in the November-December 2001 issue of American Scientist."
+        ] }
+        
+        , { p : [ 
+            "The usual "
+            , { strong : "unbalanced" }
+            , " bases are supported for "
+            , yak.html( "1&nbsp;&le;&nbsp;N&nbsp;&le;&nbsp;36 :" ) 
+        ] }
+        , { ul : [ 
+            { li : "base 2 (binary) uses the digits 0 and 1." }
+            , { li : "..." }
+            , { li : "base 10 (decimal) uses the digits " + yak.array( 10 ).map( yak.f( "k" ) ).join( ", " ) + "." }
+            , { li : "..." }
+            , { li : "base 16 (hexadecimal) uses the digits " + yak.array( 16 ).map( yak.f( "k.toString( 16 )" ) ).join( ", " ) + ", with respective decimal values " + yak.array( 16 ).map( yak.f( "k" ) ).join( ", " ) }
+            , { li : "..." }
+            , { li : "base 36 uses the digits 0, 1, ... , 9, a, b, ... , y, z with respective decimal values 0, 1, ... , 9, 10, 11, ..., 34, 35" }
+        ] }
+        
+
+        , { p : [ 
+            { strong : "Balanced" } 
+            , " bases are also supported for "
+            , yak.html( "3&nbsp;&le;&nbsp;N&nbsp;&le;&nbsp;70" )
+            , '. They use additional "negative digits", marked by an underline:'
+        ] }
+
+        , { ul : [ '_z', '_y', '_x' ].map( describe_bb_digit )
+            .concat( ' ... ' )
+            .concat( [ '_b', '_a', '_9', '_8' ].map( describe_bb_digit ) )
+            .concat( ' ... ' )
+            .concat( [ '_2', '_1' ].map( describe_bb_digit ) )
+            .map( yak.f( '{li:v}' ))
+          }
+        
+        , { p : [
+            'For example, in balanced ternary base, digits '
+            , ynh( '_1' )
+            , ', 0 and 1 are used, and the number '
+            , { p : balanced_ternary_number_html }
+            , ' has the decimal value -1 * 3^3 + 0 * 3^2 + 1 * 3 - 1 = -25'
+        ]
+        }
+
+        , { h2 : 'API usage' }
+
+        , { p : [ 
+            'Use the underscore "_" before a negative digit. For example, the balanced ternary number ' 
+            , balanced_ternary_number_html 
+            , ' can be written in a text editor '
+            , { code : '"' + balanced_ternary_number_string + '"' }
+        ] }
+
+        , { ul : { li : [
+            
+            { code : 'numbase.parseInt( <intString>, <base> )' }
+            
+            , ' converts an integer of any base to a decimal value, for example:'
+        ] } }
+
+        , { pre : { code : [
+            'var decimal_value = ' + example_1 + ';'
+            , '// ' + eval( example_1 )
+        ].join( '\n' ) } }
+
+        , { ul : { li : [
+            { code : 'numbase.parse( <fullString> )' }
+            , ' converts a float of any base to a decimal value. '
+            , { code : '<fullString>' }
+            , yak.html( ' contains three parts, separated by column: (1)&nbsp;the base, (2)&nbsp;integer and/or fractional part(s) and (3)&nbsp;an optional exponent. For example the string:' )
+        ]}}
+
+        , { pre : { code : '"' + balanced_ternary_float_string + '"' }}
+
+        , { p : 'represents in balanced ternary base a float with decimal value -1*3 + 0*1 + 1/3 - 1/(3*3) = ' + numbase.parse( balanced_ternary_float_string ) }
+
+        , { p : [ 
+
+            'Let us now append an exponent '
+            , ynh( balanced_ternary_exp )
+            , ':'
+        ]}
+
+        , { pre : { code : '"' + balanced_ternary_float_string_exp + '"' } }
+
+        , { p : [
+            'This has the effect of multiplying by the decimal value 3^(1*(3*3) - 1*3 + 0) = 3^6 = 729 so that we should obtain the decimal value ' 
+            , yak.html( [ numbase.parse( balanced_ternary_float_string ), '*', '729', '=', numbase.parse( balanced_ternary_float_string )*729 ].join( '&nbsp;' ) )
+        ] }
+
+        , { p : [ 'Let us check:' ] }
+
+        , { pre : { code : 'var decimal_value_2 = ' + example_2 + ';\n// ' + eval( example_2 ) } }
+        
+        , { ul : { li : [
+            { code : 'numbase.str( <float>, <base> )' }
+            , ' converts a JavaScript float value to a string in the given base. Rounding errors might occur. Example:'
+        ]}}
+
+        , { pre : { code : [ 'var balanced_ternary_string = ' + convert_to_balanced_ternary_string + ';'
+                             , '// ' + eval( convert_to_balanced_ternary_string )
+        ]}}
+
+        , { hr : null }
+
+        ,  { p : 'By Guillaume Lathoud, February 2015.' }
+    ];
+
+    // --- Details
+
+    function describe_bb_digit( /*string*/s )
+    {
+        var n = numbase.parseInt( s, "b70" );
+        return yak.html( 
+            numbase.html( s ).join( '' ) + '&nbsp;(decimal value: ' + n + ')'
+        );
+    }
+
+    function ynh( s ) { return yak.html( numbase.html( s ).join( '' ) ); }
+
+}
+    </script>
+
+xxx further writeup: tradeoffs balanced bases: odd unique representation and one-rule rounding, but try to represent 0.5 vs. even: not unique representation because of e.g. _A, not necessary but a voluntary choice so that negation and substraction simple -> substraction easily reduced to an addition in all cases, rounding in almost all cases by truncating but one special case not dramatic.
+
+xxx why the fuss? picture france nonante -> 4*20+10 -> what if we push it?  + balanced ternary article
+
+
+    <script type="text/javascript">yak.parse();</script>
+  </body>
+</html>

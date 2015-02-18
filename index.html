@@ -5,9 +5,13 @@
     <title>numbase</title>
     <script type="text/javascript" src="yak.js"></script>
     <script type="text/javascript" src="numbase.js"></script>
+    <script type="text/javascript" src="test_numbase.js"></script>
     <link rel="stylesheet" type="text/css" href="numbase.css">
     <style type="text/css">
       .number-table { text-align: right }
+      .op_table_legend_cell { border : solid 1px black; padding : 1px 3px 1px 2px; }
+    .happy { color : green }
+    .sad { color : red }
     </style>
   </head>
   <body>
@@ -31,6 +35,8 @@ function ()
     , small_decimal_value = -0.25
     , convert_small_value_to_balanced_ternary_string = 'numbase.str( ' + small_decimal_value + ', "b3" )'
     , convert_back_small_value_from_balanced_ternary_string = 'numbase.parse( ' + convert_small_value_to_balanced_ternary_string + ')'
+
+    , h_rArr = yak.html( '&rArr;' )
     ;
 
     return [
@@ -42,14 +48,15 @@ function ()
             , ']'
             
             , '['
-            , { 'a href="http://github.com/glathoud/js.yak"' : 'GitHub repository for numbase' }
+            , { 'a href="http://github.com/glathoud/numbase"' : 'GitHub repository for numbase' }
             , ']'
         ] }
 
         , { h1 : "numbase" }
         
         , { p : [ 
-            "Inspired by "
+            "This JavaScript implementation encodes and parses numbers to resp. from any balanced or unbalanced base."
+            , "Inspiration: "
             , third_base_link
             , ", a column from Brian Hayes published in the November-December 2001 issue of American Scientist."
         ] }
@@ -94,6 +101,39 @@ function ()
             , ' has the decimal value -1 * 3^3 + 0 * 3^2 + 1 * 3 - 1 = -25'
         ]
         }
+
+        // --------------------------------------------------
+
+        , { h2 : 'Properties of balanced bases' }
+
+        , { h4 : 'Balanced odd bases'}
+
+        , { p : [ 
+            'Negating a number can be done by negating each digit: '
+            , ynh( '-_101_1' )
+            , ' = '
+            , ynh( '10_11' )
+            , '. This nifty property reduces substraction to an addition.'
+        ]}
+
+        , { p : [ ' More niceties can be found in ', third_base_link, '. ' ] }
+
+
+        , { h4 : 'Balanced even bases' }
+        
+        , { p : [
+            , 'To have these nice properties for balanced even bases as well, I am using an "extra negative digit". For example, while in balanced base 4, any number could be (uniquely) represented using only four digits ', [ '_1', '0', '1', '2' ].map( ynh )
+            , ', I also use an extra fifth digit ', ynh( '_2' ), '.'
+        ]}
+
+        , { p : 'Tradoff:' }
+
+        , { ul : [ 
+            { li : '[+] Nice properties like easy negation are valid for balanced even bases as well.' }
+            , { li : [ yak.html( '[&ndash;] ' ), ' Some numbers have multiple representations in balanced even bases, e.g. in balanced base 4: '
+                       , ynh( '_2' ), ' = ', ynh( '_12' )
+                     ]}
+        ]}
 
         // --------------------------------------------------
 
@@ -194,9 +234,11 @@ function ()
                     
 
 
-        , { ul : { li : [
-            'Since we have to use a finite number of digits, (small) rounding errors may occur. However, we use a big enough number of digits to remain within the rounding error inherent to the JavaScript float representation (52 bits, see IEEE 754). Example:'
-        ]}}
+        , { h4 : 'Precision' }
+
+        , { p : 
+            'Since we have to use a finite number of digits, (small) rounding errors may occur. However, we use a big enough number of digits to remain within the rounding error inherent to the JavaScript 64-bit float representation (52 usable bits, see IEEE 754). Example:'
+        }
 
         , { pre : { code : [ 'var small_value_back_and_forth = ' + convert_back_small_value_from_balanced_ternary_string + ';'
                              , '// ' + eval( convert_back_small_value_from_balanced_ternary_string )
@@ -204,60 +246,174 @@ function ()
 
         // --------------------------------------------------
 
-        , { h2 : 'Particular case: balanced base 20' }
+        , { h2 : 'A look at balanced base 20' }
 
-        , { p : 'Addition' }
+        , (function () {
+
+            var arr = [ 0, 1, 2, '...', 9, 10, 11, 12, '...', 18, 19, 20, 21 ];
+
+            return [ { p : 'Decimal values: ' }
+                     , { p : arr.join( ', ') }
+                     , { p : ' can be written in balanced base 20 respectively as: ' }
+                     , { p : [
+                         '0'
+                , arr.map( _b20number_or_string ).slice( 1 )
+            ] }
+
+                   ];
+
+            function _b20number_or_string( x )
+            {
+                return 'string' === typeof x 
+                    ?  x
+                    :  [ ', ', ynh_str( x, 'b20' ) ]
+                    ;
+            }
+
+        })()
+
+        , { p : 'Addition:' }
 
         , { 'table class="number-table"' : { tbody : b20_tbody_content( '+' ) } }
 
-        , { p : 'Multiplication' }
+        , { p : 'Multiplication:' }
 
         , { 'table class="number-table"' : { tbody : b20_tbody_content( '*' ) } }
+
+        // --------------------------------------------------
+
+        , { h2: 'Why the fuss?' }
+
+        , { p : 'xxx picture france nonante -> 4*20+10 -> what if we push it?  + balanced ternary article' }
+
+        // --------------------------------------------------
+
+        , { h2: 'Details' }
+
+        , { h4 : 'Rounding in balanced odd bases' }
+
+        , { p : [
+            'In balanced odd bases, rounding a real can be done by just removing the digits at the end. For example, in balanced ternary base:'
+        ]}
+
+        , { p : ynh( '_101_1.10_1_11_1' ) }
+
+        , { p: [ ' can be rounded to 3 decimal places (after the dot) by simply truncating: ']}
+        
+        , { p : ynh( '_101_1.10_1' ) }
+
+        , { h4 : 'Rounding in balanced even bases' }
+
+        , { p : [ 'In balanced even bases, rounding works as well by removing the last digit'
+                  , yak.html('&ndash;')
+                  , ' except when it is a "middle digit", e.g. ', ynh( '_2') , 'or 2 in balanced base 4.'
+                ] }
+
+        , { p : 'Rounding examples in balanced base 4:' }
+        , { p : [ ynh( '2.12101_1' ), yak.html( '&rarr;' ), ynh( '2.121' ), '(0 is not a middle digit ', h_rArr, ' simply truncate)' ] }
+
+        , { p : [ ynh( '2.121' ), yak.html( '&rarr;' ), ynh( '2.12' ), '(1 is not a middle digit ', h_rArr, ' simply truncate)' ] }
+
+        , { p : [ ynh( '2.12' ), yak.html( '&rarr;' ), ynh( '2.2' ), '(2 IS a middle digit ', h_rArr, 'round up)' ] }
+
+        , { p : [ ynh( '2.1_2' ), yak.html( '&rarr;' ), ynh( '2.1' ), '(2 IS a middle digit ', h_rArr, 'round up ', h_rArr, 'happens to be like truncation in this case.)' ] }
+
+        , { p : [ ynh( '2._12' ), yak.html( '&rarr;' ), ynh( '2._1' ), '(' , ynh( '_2' ), ' IS a middle digit ', h_rArr, 'round up ', h_rArr, 'happens to be like truncation in this case.)' ] }
+
+        , { p : [ ynh( '2._1_2' ), yak.html( '&rarr;' ), ynh( '2._2' ), '(' , ynh( '_2' ), '  IS a middle digit ', h_rArr, 'round up)' ] }
+
+        // --------------------------------------------------
+
+
+        , { h2 : 'Tests' }
+
+        , { 'p id="test-result"' : (function () {
+            
+            setTimeout(function () {
+                
+                test_numbase( 'test-result' );
+                
+            }, 0 );
+
+            return '';
+
+        })() }
+
+        // --------------------------------------------------
 
         , { hr : null }
 
         ,  { p : 'By Guillaume Lathoud, February 2015.' }
+
+
     ];
 
     // --- Details
 
     function describe_bb_digit( /*string*/s )
     {
-        var n = numbase.parseInt( s, "b70" );
-        return yak.html( 
-            numbase.html( s ).join( '' ) + '&nbsp;(decimal value: ' + n + ')'
-        );
+        return describe_number( "b70", s );
     }
 
+    function describe_number( /*string*/base, /*string*/s )
+    {
+        var x = numbase.parse( base + ':' + s );
+        return yak.html(
+            numbase.html( s ).join( '' ) + '&nbsp;(decimal value: ' + x + ')'
+        );
+    }
+    
     function ynh( s ) { return yak.html( numbase.html( s ).join( '' ) ); }
 
+    function ynh_str( s, base ) { return ynh( numbase.str( s, base ) ); }
+    
     function b20_tbody_content( /*string | function*/op )
     {
-        var op_f = yak.f( op );
-        return yak.array( 41 ).map( _b20_tbody_content_one_row );
+        var op_f = yak.f( op )
+        ,   hfr  = { tr : _b20_tbody_content_head_foot_row().map( _b20_legend_cell ) }
+        ;
+        return [ hfr ]
+            .concat( yak.array( 21 )
+                     .map( _b20_tbody_content_one_row )
+                   )
+            .concat( hfr )
+        ;
 
         function _b20_tbody_content_one_row( tmp, i )
         {
-            var y = 20 - i;
-            return { tr : yak.array( 41 ).map( _b20_tbody_content_one_col ) };
+            var y = 20 - i
+            ,  opca = [ _b20_legend_cell( ynh_str( y, "b20" ) ) ] 
+            ;
+            return { tr : opca
+                     .concat( yak.array( 21 ).map( _b20_tbody_content_one_col ) )
+                     .concat( opca )
+                   };
 
             function _b20_tbody_content_one_col( tmp, j )
             {
-                var x = j - 20
+                var x = j
                 ,   z = op_f( y, x )
                 ;
-                return { td : ynh( numbase.str( z, 'b20' ) ) }
+                return { td : ynh_str( z, 'b20' ) };
             }
+        }
+
+        function _b20_tbody_content_head_foot_row()
+        {
+            return [ op ]
+                .concat( yak.array( 21 ).map( function (v,k) { return ynh_str( k, "b20" ); } ) )
+                .concat( [ op ] )
+            ;
+        }
+
+        function _b20_legend_cell( a )
+        {
+            return { 'td class="op_table_legend_cell"' : a }
         }
     }
 
 }
     </script>
-
-xxx further writeup: tradeoffs balanced bases: odd unique representation and one-rule rounding, but try to represent 0.5 vs. even: not unique representation because of e.g. _A, not necessary but a voluntary choice so that negation and substraction simple -> substraction easily reduced to an addition in all cases, rounding in almost all cases by truncating but one special case not dramatic.
-
-xxx why the fuss? picture france nonante -> 4*20+10 -> what if we push it?  + balanced ternary article
-
 
     <script type="text/javascript">yak.parse();</script>
   </body>

@@ -13,7 +13,7 @@ var numbase;
     
     // --- Implementation
 
-    var  _NUMBASE_SPLIT_RX = /(_[^_]|[^_])/g
+    var  _NUMBASE_SPLIT_RX = /_[^_]|[^_]/g
     ,    _BINARY_PRECISION = 52  // IEEE 754 double (64 bits)  http://en.wikipedia.org/wiki/Double-precision_floating-point_format
     ,    _2_POW_BIN_PREC   = Math.pow( 2, _BINARY_PRECISION )
     ,    _SMALL_POWERSHIFT = 4
@@ -49,7 +49,7 @@ var numbase;
         (base_radix  ||  null).toPrecision.call.a;
 
         var      mo = sInt.match( /^(\+|-)?(.*)$/ )
-        ,      sign = mo[ 1 ] === '-'  ?  -1  :  +1
+        ,  pre_sign = mo[ 1 ] === '-'  ?  -1  :  +1
         
         , base_n_digit = is_balanced  ?  1 + (base_radix >> 1)  :  base_radix
 
@@ -75,14 +75,14 @@ var numbase;
 
         for (var i = digit_arr.length, factor = 1; i--; factor *= base_radix)
         {
-            var  d_str = digit_arr[ i ]
-            ,     sign = d_str.charAt( 0 ) === '_'  ?  -1  :  +1
-            ,    digit = base_digit_arr.indexOf( d_str.charAt( sign < 0  ?  1  :  0 ) ) | 0
+            var  d_str  = digit_arr[ i ]
+            ,    d_sign = d_str.charAt( 0 ) === '_'  ?  -1  :  +1
+            ,    digit  = base_digit_arr.indexOf( d_str.charAt( d_sign < 0  ?  1  :  0 ) ) | 0
             ;
-            number += sign * digit * factor;
+            number += d_sign * digit * factor;
         }
         
-        return number;
+        return pre_sign * number;
 
     }
     
@@ -122,6 +122,8 @@ var numbase;
     // can be fed into `numbase.parse()` to obtained another number
     // `v2` very close to the original number `v` (rounding errors).
     {
+        // xxx need to refactor, esp. to factor the common parts where reasonable
+
         var str_base     = 'string' === typeof base
         ,    is_balanced = str_base  &&  'b' === base.charAt( 0 ).toLowerCase()  ||  false
         ,  base_radix   = str_base  ?  base.match( /\d+/ ) | 0  :  base
@@ -222,7 +224,7 @@ var numbase;
         {
             // Unbalanced base
 
-            var  precision = 1 + Math.round( Math.log( _2_POW_BIN_PREC ) / Math.log( base_radix ) );
+            var  precision = 1 + Math.ceil( Math.log( _2_POW_BIN_PREC ) / Math.log( base_radix ) );
          
             var    rest     = v
             ,      rest_end = Math.abs( rest ) / _2_POW_BIN_PREC / 2  // Not using >> because it would automatically switch to the 32-bit JS integer representation
@@ -243,7 +245,7 @@ var numbase;
                 var rest_sign = rest < 0  ?  -1  :  +1
                 ,   rest_abs = Math.abs( rest )
                 
-                ,  digit_int = tmp_value > rest_abs  &&  rest_abs > tmp_value / base_radix * (1 - 1e-10) 
+                ,  digit_int = tmp_value > rest_abs  &&  rest_abs > tmp_value / 2 * (1 - 1e-10) 
                     ?  rest_sign 
                     :  rest_sign * Math.round( rest_abs / tmp_value )
                 ;
@@ -301,7 +303,7 @@ var numbase;
                     , p_rest_sign = powershift_rest < 0  ?  -1  :  +1
                     , p_rest_abs  = Math.abs( powershift_rest )
 
-                    ,     exponent_digit_int  = tmp_value > p_rest_abs  &&  p_rest_abs > tmp_value / base_radix * (1 - 1e-10)
+                    ,     exponent_digit_int  = tmp_value > p_rest_abs  &&  p_rest_abs > tmp_value / 2 * (1 - 1e-10)
                         ?  p_rest_sign
                         :  p_rest_sign * Math.round( p_rest_abs / tmp_value )
                     ;

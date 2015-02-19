@@ -19,7 +19,10 @@
     <script type="text/yak.js">
 function () 
 {
-    var third_base_link = { "a href='http://web.williams.edu/Mathematics/sjmiller/public_html/105Sp10/addcomments/Hayes_ThirdBase.htm'" : "Third Base" }
+    var expl_int  = 123
+    ,   expl_real = -123.25
+
+    , third_base_link = { "a href='http://web.williams.edu/Mathematics/sjmiller/public_html/105Sp10/addcomments/Hayes_ThirdBase.htm'" : "Third Base" }
     , balanced_ternary_number_string = '_101_1'
     , balanced_ternary_number_html = ynh( balanced_ternary_number_string )
     ,         example_1 = 'numbase.parseInt( "' + balanced_ternary_number_string + '", "b3" )'
@@ -36,7 +39,9 @@ function ()
     , convert_small_value_to_balanced_ternary_string = 'numbase.str( ' + small_decimal_value + ', "b3" )'
     , convert_back_small_value_from_balanced_ternary_string = 'numbase.parse( ' + convert_small_value_to_balanced_ternary_string + ')'
 
-    , h_rArr = yak.html( '&rArr;' )
+    , h_rArrow = yak.html( '&rArr;' )
+    , h_lrarrow = yak.html( '&lrarr;' )
+    , h_rarrow = yak.html( '&rarr;' )
     ;
 
     return [
@@ -55,12 +60,34 @@ function ()
         , { h1 : "numbase" }
         
         , { p : [ 
-            "This JavaScript implementation encodes and parses numbers to resp. from any balanced or unbalanced base."
-            , "Inspiration: "
+            { code : 'numbase' }
+            , " is a JavaScript implementation to encode and decode string representations of numbers in any base, including balanced bases:"
+        ]}
+
+        , { blockquote : [ { code : '<float value>' }, h_lrarrow, { code : '"<string representation>"' }, h_rarrow, '<HTML representation>' ] }
+        
+        , { p : 'Integer examples:' }
+        
+        , { blockquote : [ { code : expl_int }, h_lrarrow, { code : '"' + numbase.str( expl_int, 2 )  + '"' }, h_rarrow, ynh_str( expl_int, 2 ), ' (binary)' ] }
+        , { blockquote : [ { code : expl_int }, h_lrarrow, { code : '"' + numbase.str( expl_int, 16 ) + '"' }, h_rarrow, ynh_str( expl_int, 16 ), ' (hexadecimal)' ] }
+        , { blockquote : [ { code : expl_int }, h_lrarrow, { code : '"' + numbase.str( expl_int, 'b3' ) + '"' }, h_rarrow, ynh_str( expl_int, 'b3' ), '(balanced ternary)' ] }
+
+        , { p : 'Real number examples:' }
+
+        , { blockquote : [ { code : expl_real }, h_lrarrow, { code : '"' + numbase.str( expl_real, 2 )  + '"' }, h_rarrow, ynh_str( expl_real, 2 ), ' (binary)' ] }
+        , { blockquote : [ { code : expl_real }, h_lrarrow, { code : '"' + numbase.str( expl_real, 16 ) + '"' }, h_rarrow, ynh_str( expl_real, 16 ), ' (hexadecimal)' ] }
+        , { blockquote : [ { code : expl_real }, h_lrarrow, { code : '"' + numbase.str( expl_real, 'b3' ) + '"' }, h_rarrow, ynh_str( expl_real, 'b3' ), '(balanced ternary, ', ynh( '_100_1' ) , ' is the exponent)' ] }
+
+        , {p : [
+             "Inspiration: "
             , third_base_link
             , ", a column from Brian Hayes published in the November-December 2001 issue of American Scientist."
         ] }
         
+        // --------------------------------------------------
+
+        , { h2 : 'Bases and digits' }
+
         , { p : [ 
             "The usual "
             , { strong : "unbalanced" }
@@ -310,17 +337,17 @@ function ()
                 ] }
 
         , { p : 'Rounding examples in balanced base 4:' }
-        , { p : [ ynh( '2.12101_1' ), yak.html( '&rarr;' ), ynh( '2.121' ), '(0 is not a middle digit ', h_rArr, ' simply truncate)' ] }
+        , { p : [ ynh( '2.12101_1' ), yak.html( '&rarr;' ), ynh( '2.121' ), '(0 is not a middle digit ', h_rArrow, ' simply truncate)' ] }
 
-        , { p : [ ynh( '2.121' ), yak.html( '&rarr;' ), ynh( '2.12' ), '(1 is not a middle digit ', h_rArr, ' simply truncate)' ] }
+        , { p : [ ynh( '2.121' ), yak.html( '&rarr;' ), ynh( '2.12' ), '(1 is not a middle digit ', h_rArrow, ' simply truncate)' ] }
 
-        , { p : [ ynh( '2.12' ), yak.html( '&rarr;' ), ynh( '2.2' ), '(2 IS a middle digit ', h_rArr, 'round up)' ] }
+        , { p : [ ynh( '2.12' ), yak.html( '&rarr;' ), ynh( '2.2' ), '(2 IS a middle digit ', h_rArrow, 'round up)' ] }
 
-        , { p : [ ynh( '2.1_2' ), yak.html( '&rarr;' ), ynh( '2.1' ), '(2 IS a middle digit ', h_rArr, 'round up ', h_rArr, 'happens to be like truncation in this case.)' ] }
+        , { p : [ ynh( '2.1_2' ), yak.html( '&rarr;' ), ynh( '2.1' ), '(2 IS a middle digit ', h_rArrow, 'round up ', h_rArrow, 'happens to be like truncation in this case.)' ] }
 
-        , { p : [ ynh( '2._12' ), yak.html( '&rarr;' ), ynh( '2._1' ), '(' , ynh( '_2' ), ' IS a middle digit ', h_rArr, 'round up ', h_rArr, 'happens to be like truncation in this case.)' ] }
+        , { p : [ ynh( '2._12' ), yak.html( '&rarr;' ), ynh( '2._1' ), '(' , ynh( '_2' ), ' IS a middle digit ', h_rArrow, 'round up ', h_rArrow, 'happens to be like truncation in this case.)' ] }
 
-        , { p : [ ynh( '2._1_2' ), yak.html( '&rarr;' ), ynh( '2._2' ), '(' , ynh( '_2' ), '  IS a middle digit ', h_rArr, 'round up)' ] }
+        , { p : [ ynh( '2._1_2' ), yak.html( '&rarr;' ), ynh( '2._2' ), '(' , ynh( '_2' ), '  IS a middle digit ', h_rArrow, 'round up)' ] }
 
         // --------------------------------------------------
 

@@ -10,25 +10,44 @@ function test_numbase( /*? DOM node | DOM id string?*/node_or_id )
     , result_arr = create_test_arr().map( run_one_test )
     , all_passed = result_arr.every( yak.f( '.ok' ) )
 
+    , success_arr = result_arr.filter( yak.f( '.ok' ) )
+    , failure_arr = result_arr.filter( yak.f( '!v.ok' ) )
+
     , n_total    = result_arr.length
-    , n_success  = result_arr.filter( yak.f( '.ok' ) ).length
-    , n_failure  = n_total - n_success
+    , n_success  = success_arr.length
+    , n_failure  = failure_arr.length
     ;
+    if (n_total !== n_success + n_failure)
+        null.bug;
     
     if (outnode)
     {
-        outnode.innerHTML = yak( 
+        var ok_fail = []
+        , tmp =
+
+        outnode.innerHTML = yak(
             [
                 { p : [
                     'Summary: ran '
                     , n_total, ' tests, got '
-                    , n_failure, ' failures.'
+                    , n_success, ' success(es) and '
+                    , n_failure, ' failure(s).'
                 ] }
-                , { ul : result_arr.map( format_one_result ).map( yak.f( '{ li : v }' ) ) }
+                , { ul : 
+                    [ { ok : true, name : 'ok', arr : success_arr }
+                      , { ok : false, name : 'failed', arr : failure_arr }
+                    ]
+                    .map( format_ok_failed_list )
+                    .filter( yak.f( '' ))
+                    .map( yak.f( '{li:v}' ) )
+                  }
             ]
         );
     }
     
+    if (all_passed  &&  'undefined' !== typeof console)
+        console.log( 'All ' + n_total + ' tests passed.' );
+
     return { 
         all_passed   : all_passed
         , result_arr : result_arr
@@ -68,54 +87,47 @@ function test_numbase( /*? DOM node | DOM id string?*/node_or_id )
         return { ok : ok, name : name };
     }
 
-    function format_one_result( result )
+    function format_ok_failed_list( o )
     {
-        return [
-            result.name + ': '
-            , yak.o(
-                'span class="' + (result.ok  ?  'happy'  :  'sad') + '"'
-                ,  result.ok  ?  'ok'  :  'failed'
+        return o.arr.length > 0  &&  [
+            yak.o(
+                'span class="' + (o.ok  ?  'happy'  :  'sad') + '"'
+                ,  o.name
             )
+            , ': ' + (o.arr.map( yak.f( '.name' )).join( ', ' ))
+            , '.'
         ];
     }
+    
 
     function create_test_arr()
     {
-        var FOUR_EXP = '4:120.213:-210'
-        ,   FOUR     = '4:120.213'
-        ,   FOUR_INT = '4:120'
+        var FOUR_INT = '4:120',            V_FOUR_INT = 1*4*4 + 2*4 + 0*1
+        ,   FOUR     = FOUR_INT + '.213',  V_FOUR     = V_FOUR_INT + /*.*/ 2/4 + 1/(4*4) + 3/(4*4*4)
+        ,   FOUR_EXP = FOUR + ':-210',     V_FOUR_EXP = V_FOUR * Math.pow( 4, -(2*4*4 + 1*4 + 0) )
+
+        ,   BALTHREE_INT = 'b3:_101_1',        V_BALTHREE_INT = ((-1*3 + 0)*3 + 1)*3 - 1
+        ,   BALTHREE_INT_NEG = 'b3:-_101_1',   V_BALTHREE_INT_NEG = -V_BALTHREE_INT
+
+        ,   BALFIVE_INT = 'b5:_210_2',         V_BALFIVE_INT = -2*5*5*5 + 1*5*5 + 0*5 - 2*1
+        ,   BALFIVE = BALFIVE_INT + '._201_1', V_BALFIVE     = V_BALFIVE_INT - 2/5 + 0/(5*5) + 1/(5*5*5) - 1/(5*5*5*5)
+        ,   BALFIVE_EXP = BALFIVE + ':_101',   V_BALFIVE_EXP = V_BALFIVE * Math.pow( 5, (- 1*5 + 0)*5 + 1*1 )
         ;
         return [ 
 
             function parse_four_exp()
             {
-                var s = FOUR_EXP;
-
-                return equal( 
-                    numbase.parse( s )
-                    , (1*4*4 + 2*4 + 0*1 + /*.*/ 2/4 + 1/(4*4) + 3/(4*4*4))
-                        * Math.pow( 4, -(2*4*4 + 1*4 + 0*1))
-                );
+                return equal( numbase.parse( FOUR_EXP ), V_FOUR_EXP );
             }
 
             , function parse_four()
             {
-                var s = FOUR;
-
-                return equal( 
-                    numbase.parse( s )
-                    , (1*4*4 + 2*4 + 0*1 + /*.*/ 2/4 + 1/(4*4) + 3/(4*4*4))
-                );
+                return equal( numbase.parse( FOUR ), V_FOUR );
             }
 
             , function parse_four_int()
             {
-                var s = FOUR_INT;
-
-                return equal( 
-                    numbase.parse( s )
-                    , 1*4*4 + 2*4 + 0*1
-                );
+                return equal( numbase.parse( FOUR_INT ), V_FOUR_INT );
             }
 
             , function parseInt_four_int()
@@ -129,6 +141,85 @@ function test_numbase( /*? DOM node | DOM id string?*/node_or_id )
                     , numbase.parse( s )
                 );
             }
+
+            , function backforth_four_int()
+            {
+                return equal( V_FOUR_INT, numbase.parse( numbase.str( V_FOUR_INT, 4 ) ) );
+            }
+
+            , function backforth_four()
+            {
+                return equal( V_FOUR, numbase.parse( numbase.str( V_FOUR, 4 ) ) );
+            }
+
+            , function backforth_four_exp()
+            {
+                return equal( V_FOUR_EXP, numbase.parse( numbase.str( V_FOUR_EXP, 4 ) ) );
+            }
+
+
+
+            , function parse_balthree_int()
+            {
+                return equal( numbase.parse( BALTHREE_INT ), V_BALTHREE_INT );
+            }
+            , function parse_balthree_int_neg()
+            {
+                return equal( numbase.parse( BALTHREE_INT_NEG ), V_BALTHREE_INT_NEG );
+            }
+            , function parseInt_balthree_int()
+            {
+                return equal( numbase.parseInt( BALTHREE_INT.split( ':' )[ 1 ], 'b3' ), V_BALTHREE_INT );
+            }
+            , function parseInt_balthree_int_neg()
+            {
+                return equal( numbase.parseInt( BALTHREE_INT_NEG.split( ':' )[ 1 ], 'b3' ), V_BALTHREE_INT_NEG );
+            }
+
+
+
+
+            , function parse_balfive_int()
+            {
+                return equal( numbase.parse( BALFIVE_INT ), V_BALFIVE_INT );
+            }
+            
+            , function parse_balfive()
+            {
+                return equal( numbase.parse( BALFIVE ), V_BALFIVE );
+            }
+
+           , function parse_balfive_exp()
+            {
+                return equal( numbase.parse( BALFIVE_EXP ), V_BALFIVE_EXP );
+            }
+
+            , function parseInt_balfive_int()
+            {
+                var s   = BALFIVE_INT
+                ,   arr = BALFIVE_INT.split( ':' )
+                ;
+                return equal(
+                    numbase.parseInt( arr[ 1 ], arr[ 0 ] )
+                    , numbase.parse( s )
+                );
+            }
+            , function backforth_balfive_int()
+            {
+                return equal( V_BALFIVE_INT, numbase.parse( numbase.str( V_BALFIVE_INT, 'b5' ) ) );
+            }
+            , function backforth_balfive()
+            {
+                return equal( V_BALFIVE, numbase.parse( numbase.str( V_BALFIVE, 'b5' ) ) );
+            }
+            , function backforth_balfive_exp()
+            {
+                return equal( V_BALFIVE_EXP, numbase.parse( numbase.str( V_BALFIVE_EXP, 'b5' ) ) );
+            }
+
+            
+
+            
             
         ];
     }

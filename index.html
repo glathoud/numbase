@@ -8,10 +8,16 @@
     <script type="text/javascript" src="test_numbase.js"></script>
     <link rel="stylesheet" type="text/css" href="numbase.css">
     <style type="text/css">
-      .number-table { text-align: right }
-      .op_table_legend_cell { border : solid 1px black; padding : 1px 3px 1px 2px; }
-    .happy { color : green }
-    .sad { color : red }
+.toplink { display: inline-block; margin: 0.5em; }
+code { font-size: 111%; }
+.number-table { text-align: right }
+.op_table_legend_cell { border : solid 1px black; padding : 1px 3px 1px 2px; }
+    .api-entry { border : solid 2px blue; background-color: wheat; margin : 1em; margin-bottom: 0.1em; margin-top: 1.5em;
+                 padding: 1em; display : inline-block; min-width : 300px; }
+.happy { color : green }
+.sad { color : red }
+
+@media print { .anchor { visibility : hidden; } }
     </style>
   </head>
   <body>
@@ -39,22 +45,22 @@ function ()
     , convert_small_value_to_balanced_ternary_string = 'numbase.str( ' + small_decimal_value + ', "b3" )'
     , convert_back_small_value_from_balanced_ternary_string = 'numbase.parse( ' + convert_small_value_to_balanced_ternary_string + ')'
 
-    , h_rArrow = yak.html( '&rArr;' )
-    , h_lrarrow = yak.html( '&lrarr;' )
-    , h_rarrow = yak.html( '&rarr;' )
+
+    , h_nbsp    = yak.html( '&nbsp;' )
+    , h_ndash   = yak.html( '&ndash;' )
+    , h_rArrow  = yak.html( '&nbsp;&rArr;&nbsp;' )
+    , h_lrarrow = yak.html( '&nbsp;&lrarr;&nbsp;' )
+    , h_rarrow  = yak.html( '&nbsp;&rarr;&nbsp;' )
     ;
 
     return [
 
         { p : [ 
 
-            '['
-            , { 'a href=".."' : 'home' }
-            , ']'
+            toplink( { 'a href=".."' : 'home' } )
             
-            , '['
-            , { 'a href="http://github.com/glathoud/numbase"' : 'GitHub repository for numbase' }
-            , ']'
+            , toplink( { 'a href="http://github.com/glathoud/numbase"' : 'GitHub repository for numbase' } )
+            
         ] }
 
         , { h1 : "numbase" }
@@ -76,7 +82,7 @@ function ()
 
         , { blockquote : [ { code : expl_real }, h_lrarrow, { code : '"' + numbase.str( expl_real, 2 )  + '"' }, h_rarrow, ynh_str( expl_real, 2 ), ' (binary)' ] }
         , { blockquote : [ { code : expl_real }, h_lrarrow, { code : '"' + numbase.str( expl_real, 16 ) + '"' }, h_rarrow, ynh_str( expl_real, 16 ), ' (hexadecimal)' ] }
-        , { blockquote : [ { code : expl_real }, h_lrarrow, { code : '"' + numbase.str( expl_real, 'b3' ) + '"' }, h_rarrow, ynh_str( expl_real, 'b3' ), '(balanced ternary, ', ynh( '_100_1' ) , ' is the exponent)' ] }
+        , { blockquote : [ { code : expl_real }, h_lrarrow, { code : '"' + numbase.str( expl_real, 'b3' ) + '"' }, h_rarrow, ynh_str( expl_real, 'b3' ), ' (balanced ternary, ', ynh( '_100_1' ) , ' is the exponent)' ] }
 
         , {p : [
              "Inspiration: "
@@ -86,7 +92,7 @@ function ()
         
         // --------------------------------------------------
 
-        , { h2 : 'Bases and digits' }
+        , with_anchor( 'h2', 'Bases and digits' )
 
         , { p : [ 
             "The usual "
@@ -131,9 +137,9 @@ function ()
 
         // --------------------------------------------------
 
-        , { h2 : 'Properties of balanced bases' }
+        , with_anchor( 'h2', 'Properties of balanced bases' )
 
-        , { h4 : 'Balanced odd bases'}
+        , with_anchor( 'h4', 'Balanced odd bases' )
 
         , { p : [ 
             'Negating a number can be done by negating each digit: '
@@ -146,10 +152,10 @@ function ()
         , { p : [ ' More niceties can be found in ', third_base_link, '. ' ] }
 
 
-        , { h4 : 'Balanced even bases' }
+        , with_anchor( 'h4', 'Balanced even bases' )
         
         , { p : [
-            , 'To have these nice properties for balanced even bases as well, I am using an "extra negative digit". For example, while in balanced base 4, any number could be (uniquely) represented using only four digits ', [ '_1', '0', '1', '2' ].map( ynh )
+            , 'To have these nice properties for balanced even bases as well, I am using an "extra negative digit". For example, while in balanced base 4, any number could be represented using only four digits ', ynh( '_1, 0, 1, 2' )
             , ', I also use an extra fifth digit ', ynh( '_2' ), '.'
         ]}
 
@@ -164,7 +170,7 @@ function ()
 
         // --------------------------------------------------
 
-        , { h2 : 'API usage' }
+        , with_anchor( 'h2', 'API usage' )
 
         , { p : [ 
             'Use the underscore "_" before a negative digit. For example, the balanced ternary number ' 
@@ -173,26 +179,24 @@ function ()
             , { code : '"' + balanced_ternary_number_string + '"' }
         ] }
 
-        , { ul : { li : [
+        , api_entry( 'numbase.parseInt( <intString>, <base> )' ) 
             
-            { code : 'numbase.parseInt( <intString>, <base> )' }
-            
-            , ' converts an integer of any base to a decimal value, for example:'
-        ] } }
+        , { p : [ ' converts an integer of any base to a decimal value, for example:' ] }
 
-        , { pre : { code : [
+        , codelines( [
             'var decimal_value = ' + example_1 + ';'
             , '// ' + eval( example_1 )
-        ].join( '\n' ) } }
+        ] )
 
-        , { ul : { li : [
-            { code : 'numbase.parse( <fullString> )' }
-            , ' converts a float of any base to a decimal value. '
+        , api_entry( 'numbase.parse( <fullString> )' )
+
+        , { p : [
+            ' converts a float of any base to a decimal value. '
             , { code : '<fullString>' }
             , yak.html( ' contains three parts, separated by column: (1)&nbsp;the base, (2)&nbsp;integer and/or fractional part(s) and (3)&nbsp;an optional exponent. For example the string:' )
-        ]}}
+        ]}
 
-        , { pre : { code : '"' + balanced_ternary_float_string + '"' }}
+        , codelines( '"' + balanced_ternary_float_string + '"' )
 
         , { p : 'represents in balanced ternary base a float with decimal value -1*3 + 0*1 + 1/3 - 1/(3*3) = ' + numbase.parse( balanced_ternary_float_string ) }
 
@@ -203,7 +207,7 @@ function ()
             , ':'
         ]}
 
-        , { pre : { code : '"' + balanced_ternary_float_string_exp + '"' } }
+        , codelines( '"' + balanced_ternary_float_string_exp + '"' )
 
         , { p : [
             'This has the effect of multiplying by the decimal value 3^(1*(3*3) - 1*3 + 0) = 3^6 = 729 so that we should obtain the decimal value ' 
@@ -212,22 +216,24 @@ function ()
 
         , { p : [ 'Let us check:' ] }
 
-        , { pre : { code : 'var decimal_value_2 = ' + example_2 + ';\n// ' + eval( example_2 ) } }
+        , codelines( 'var decimal_value_2 = ' + example_2 + ';\n// ' + eval( example_2 ) )
         
-        , { ul : { li : [
-            { code : 'numbase.str( <float>, <base> )' }
-            , ' converts a JavaScript float value to a string in the given base. Example:'
-        ]}}
+        , api_entry( 'numbase.str( <float>, <base> )' )
 
-        , { pre : { code : [ 'var balanced_ternary_string = ' + convert_to_balanced_ternary_string + ';'
-                             , '// ' + eval( convert_to_balanced_ternary_string )
-                           ]}}
+        , { p : [
+             ' converts a JavaScript float value to a string in the given base. Example:'
+        ]}
 
-        , { ul : { li : [
-            'Any real number can be encoded, thanks to the optional exponent part. Example:'
-        ]}}
+        , codelines( [ 'var balanced_ternary_string = ' + convert_to_balanced_ternary_string + ';'
+                       , '// "' + eval( convert_to_balanced_ternary_string ) + '"'
+                     ])
 
-        , { pre : { code : (function () {
+
+        , with_anchor( 'h2', 'Real numbers' )
+
+        , { p : 'Any real number can be encoded, thanks to the optional exponent part. Example:' }
+
+        , codelines((function () {
 
             var s = eval( convert_small_value_to_balanced_ternary_string )
             ,   s_arr  = s.split( ':' )
@@ -242,7 +248,7 @@ function ()
             ;
 
             return [ 'var small_value_balanced_ternary_string = ' + convert_small_value_to_balanced_ternary_string + ';'
-                     , '// ' + s
+                     , '// "' + s + '"'
                      , '// '
                      , '// where "' + s_arr[ 1 ] + '"'
                      , '// represents in balanced ternary base the decimal value '
@@ -257,23 +263,23 @@ function ()
                    ];
 
 
-        })() } }
+        })())
                     
 
 
-        , { h4 : 'Precision' }
+        , with_anchor( 'h4', 'Precision' )
 
         , { p : 
             'Since we have to use a finite number of digits, (small) rounding errors may occur. However, we use a big enough number of digits to remain within the rounding error inherent to the JavaScript 64-bit float representation (52 usable bits, see IEEE 754). Example:'
         }
 
-        , { pre : { code : [ 'var small_value_back_and_forth = ' + convert_back_small_value_from_balanced_ternary_string + ';'
-                             , '// ' + eval( convert_back_small_value_from_balanced_ternary_string )
-                           ]}}
+        , codelines( [ 'var small_value_back_and_forth = ' + convert_back_small_value_from_balanced_ternary_string + ';'
+                       , '// ' + eval( convert_back_small_value_from_balanced_ternary_string )
+                     ])
 
         // --------------------------------------------------
 
-        , { h2 : 'A look at balanced base 20' }
+        , with_anchor( 'h2', 'A look at balanced base 20' )
 
         , (function () {
 
@@ -301,23 +307,48 @@ function ()
 
         , { p : 'Addition:' }
 
-        , { 'table class="number-table"' : { tbody : b20_tbody_content( '+' ) } }
+        , { 'table class="number-table"' : b20_table_content( '+' ) }
 
         , { p : 'Multiplication:' }
 
-        , { 'table class="number-table"' : { tbody : b20_tbody_content( '*' ) } }
+        , { 'table class="number-table"' : b20_table_content( '*' ) }
 
         // --------------------------------------------------
 
-        , { h2: 'Why the fuss?' }
+        , with_anchor( 'h2', 'Why the fuss?' )
 
-        , { p : 'xxx picture france nonante -> 4*20+10 -> what if we push it?  + balanced ternary article' }
+        , { p : [
+
+            'Foreign friends complained several times to me that the French language has those mysterious '
+            , '"soixante-dix-huit" (60+18) and "quatre-vingt-dix-neuf" (4*20+19) - at least the French spoken in France. '
+            , 'Guess what? This has not always been the case, both bases 10 and 20 have been used, depending on the place and time, '
+            , 'leading to this beautifully half-hearted result mixing both (', { 'a href="http://french.stackexchange.com/a/1002"' : 'details' }, ').'
+            ,  ' Base 20 appears in older languages as well, e.g. those of the Celts and Mayas ('
+                  , { 'a href="http://en.wikipedia.org/wiki/Vigesimal"' : 'details' }, ').' 
+                ] }
+        
+        , { p : [ 
+            
+            'I have been wondering how to write ', h_ndash, ' and think ', h_ndash, ' numbers in base 20 in a way that is somewhat cognitively easy, at least for people who first learnt to count in base 10. ' 
+            
+        ]}
+
+        , { p : [
+            'The digits used in a ', { 'a href="../base20"' : 'previous attempt' }, ' (2012) now seem to me to look too similar to those of the usual base 10. Thus, differentiating between the two may require too much cognitive load. I now (2014) find preferable to stick to the usual letters a,b,c... for digits with equivalent decimal value above 9, like done e.g. by the JavaScript ', {code:'<number>.toString()'},' method.'
+        ]}
+
+        , { p : [
+            'I recently (2015) read the ', third_base_link, ' article, which lead me to go one step further: if I was going to investigate an unusual '
+            , h_ndash, ' at least today ', h_ndash, ' way of counting like base 20, and *not* stop halfway through (like in French), then go for ', { em : 'balanced' }
+            , ' base 20. As mentionned above, it has nice properties. Moreover, digits b to k are not needed, which hopefuly means '
+            , ' less cognitive load.'
+        ] }
 
         // --------------------------------------------------
 
-        , { h2: 'Details' }
+        , with_anchor( 'h2', 'Details' )
 
-        , { h4 : 'Rounding in balanced odd bases' }
+        , with_anchor( 'h4', 'Rounding in balanced odd bases' )
 
         , { p : [
             'In balanced odd bases, rounding a real can be done by just removing the digits at the end. For example, in balanced ternary base:'
@@ -329,30 +360,30 @@ function ()
         
         , { p : ynh( '_101_1.10_1' ) }
 
-        , { h4 : 'Rounding in balanced even bases' }
+        , with_anchor( 'h4', 'Rounding in balanced even bases' )
 
         , { p : [ 'In balanced even bases, rounding works as well by removing the last digit'
-                  , yak.html('&ndash;')
+                  , h_ndash
                   , ' except when it is a "middle digit", e.g. ', ynh( '_2') , 'or 2 in balanced base 4.'
                 ] }
 
         , { p : 'Rounding examples in balanced base 4:' }
-        , { p : [ ynh( '2.12101_1' ), yak.html( '&rarr;' ), ynh( '2.121' ), '(0 is not a middle digit ', h_rArrow, ' simply truncate)' ] }
+        , { p : [ ynh( '2.12101_1' ), h_rarrow, ynh( '2.121' ), ' (0 is not a middle digit ', h_rArrow, ' simply truncate)' ] }
 
-        , { p : [ ynh( '2.121' ), yak.html( '&rarr;' ), ynh( '2.12' ), '(1 is not a middle digit ', h_rArrow, ' simply truncate)' ] }
+        , { p : [ ynh( '2.121' ), h_rarrow, ynh( '2.12' ), ' (1 is not a middle digit ', h_rArrow, ' simply truncate)' ] }
 
-        , { p : [ ynh( '2.12' ), yak.html( '&rarr;' ), ynh( '2.2' ), '(2 IS a middle digit ', h_rArrow, 'round up)' ] }
+        , { p : [ ynh( '2.12' ), h_rarrow, ynh( '2.2' ), ' (2 IS a middle digit ', h_rArrow, 'round up)' ] }
 
-        , { p : [ ynh( '2.1_2' ), yak.html( '&rarr;' ), ynh( '2.1' ), '(2 IS a middle digit ', h_rArrow, 'round up ', h_rArrow, 'happens to be like truncation in this case.)' ] }
+        , { p : [ ynh( '2.1_2' ), h_rarrow, ynh( '2.1' ), ' (2 IS a middle digit ', h_rArrow, 'round up ', h_rArrow, 'happens to be like truncation in this case.)' ] }
 
-        , { p : [ ynh( '2._12' ), yak.html( '&rarr;' ), ynh( '2._1' ), '(' , ynh( '_2' ), ' IS a middle digit ', h_rArrow, 'round up ', h_rArrow, 'happens to be like truncation in this case.)' ] }
+        , { p : [ ynh( '2._12' ), h_rarrow, ynh( '2._1' ), ' (' , ynh( '_2' ), ' IS a middle digit ', h_rArrow, 'round up ', h_rArrow, 'happens to be like truncation in this case.)' ] }
 
-        , { p : [ ynh( '2._1_2' ), yak.html( '&rarr;' ), ynh( '2._2' ), '(' , ynh( '_2' ), '  IS a middle digit ', h_rArrow, 'round up)' ] }
+        , { p : [ ynh( '2._1_2' ), h_rarrow, ynh( '2._2' ), ' (' , ynh( '_2' ), '  IS a middle digit ', h_rArrow, 'round up)' ] }
 
         // --------------------------------------------------
 
 
-        , { h2 : 'Tests' }
+        , with_anchor( 'h2', 'Tests' )
 
         , { 'p id="test-result"' : (function () {
             
@@ -377,6 +408,16 @@ function ()
 
     // --- Details
 
+    function api_entry( /*string*/s )
+    {
+        return { 'blockquote class="api-entry"' : { code : s } };
+    }
+
+    function codelines( /*string... | array of string*/arr )
+    {
+        return { pre : { code : ('string' === typeof arr  ?  Array.prototype.slice.call( arguments )  :  arr).join( '\n' ) } };
+    }
+
     function describe_bb_digit( /*string*/s )
     {
         return describe_number( "b70", s );
@@ -389,21 +430,45 @@ function ()
             numbase.html( s ).join( '' ) + '&nbsp;(decimal value: ' + x + ')'
         );
     }
+
+    function toplink( x ) 
+    { 
+        return { 'div class="toplink"' : [
+            '[', h_nbsp, x, h_nbsp, ']'
+        ] };
+    }
+    
+    function with_anchor( tag, content )
+    {
+        var anchor_id = content.replace( /\W/g, '-' ).toLowerCase();
+
+        return yak.o( 
+            tag + ' id="' + anchor_id + '"'
+            , [
+                content
+                , h_nbsp
+                , yak.o(
+                    'a href="#' + anchor_id + '" class="anchor"'
+                    , '#'
+                )
+            ]
+        );
+    }
     
     function ynh( s ) { return yak.html( numbase.html( s ).join( '' ) ); }
 
     function ynh_str( s, base ) { return ynh( numbase.str( s, base ) ); }
     
-    function b20_tbody_content( /*string | function*/op )
+    function b20_table_content( /*string | function*/op )
     {
         var op_f = yak.f( op )
         ,   hfr  = { tr : _b20_tbody_content_head_foot_row().map( _b20_legend_cell ) }
         ;
-        return [ hfr ]
-            .concat( yak.array( 21 )
-                     .map( _b20_tbody_content_one_row )
-                   )
-            .concat( hfr )
+        return [ 
+            { thead : hfr }
+            , { tbody : yak.array( 21 ).map( _b20_tbody_content_one_row ) }
+            , { tfoot : hfr }
+        ]
         ;
 
         function _b20_tbody_content_one_row( tmp, i )
@@ -438,6 +503,7 @@ function ()
             return { 'td class="op_table_legend_cell"' : a }
         }
     }
+
 
 }
     </script>

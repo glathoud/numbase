@@ -223,46 +223,106 @@ function test_numbase( /*? DOM node | DOM id string?*/node_or_id )
                 return 'b4:120_1101_11:_10' === numbase.str( (((1*4 + 2)*4 + 0)*4 -1)*4 + 1 + /*.*/ (0 + (1 - (1 - 1/4)/4)/4 )/4, 'b4' );
             }
 
-            , function str_small_powershift_balanced_base_4()
+            , function str_small_powershift_balanced_base_4_a()
             {
                 return 'b4:120_11.01_1' === numbase.str( (((1*4 + 2)*4 + 0)*4 -1)*4 + 1 + /*.*/ (0 + (1 - 1/4)/4 )/4, 'b4' );
             }
 
-            , function str_small_powershift_balanced_base_4()
+            , function str_small_powershift_balanced_base_4_b()
             {
                 return 'b4:120_11.01' === numbase.str( (((1*4 + 2)*4 + 0)*4 -1)*4 + 1 + /*.*/ (0 + 1/4 )/4, 'b4' );
             }
             
-            , function str_small_powershift_balanced_base_4()
+            , function str_small_powershift_balanced_base_4_c()
             {
                 return 'b4:120_11.1' === numbase.str( (((1*4 + 2)*4 + 0)*4 -1)*4 + 1 + /*.*/ 1/4, 'b4' );
             }
             
-            , function str_small_powershift_balanced_base_4()
+            , function str_small_powershift_balanced_base_4_d()
             {
                 return 'b4:120_11' === numbase.str( (((1*4 + 2)*4 + 0)*4 -1)*4 + 1, 'b4' );
             }
             
-            , function str_small_powershift_balanced_base_4()
+            , function str_small_powershift_balanced_base_4_e()
             {
                 return 'b4:120_110' === numbase.str( ((((1*4 + 2)*4 + 0)*4 -1)*4 + 1)*4, 'b4' );
             }
 
-            , function str_small_powershift_balanced_base_4()
+            , function str_small_powershift_balanced_base_4_f()
             {
                 return 'b4:120_1100' === numbase.str( ((((1*4 + 2)*4 + 0)*4 -1)*4 + 1)*4*4, 'b4' );
             }
             
-            , function str_small_powershift_balanced_base_4()
+            , function str_small_powershift_balanced_base_4_g()
             {
                 return 'b4:120_21000' === numbase.str( ((((1*4 + 2)*4 + 0)*4 -2)*4 + 1)*4*4*4, 'b4' );
             }
             
-            , function str_NO_small_powershift_balanced_base_4()
+            , function str_NO_small_powershift_balanced_base_4_g()
             {
                 return 'b4:120_21:10' === numbase.str( ((((1*4 + 2)*4 + 0)*4 -2)*4 + 1)*4*4*4*4, 'b4' );
             }
             
+
+
+
+
+            , function str_NO_small_powershift_unbalanced_base_4()
+            {
+                return '4:-1231032101:-10' === numbase.str( -(((((((((1*4 + 2)*4 + 3)*4 +1)*4 +0)*4 +3)*4 +2)*4 +1)*4 +0)*4 + 1) /(4*4*4*4), 4 );
+            }
+
+            , function str_small_powershift_unbalanced_base_4_a()
+            {
+                return '4:-123103.213' === numbase.str( -((((((((1*4 + 2)*4 + 3)*4 +1)*4 +0)*4 +3)*4 +2)*4 +1)*4 +3) /(4*4*4), 4 );
+            }
+
+            , function str_small_powershift_unbalanced_base_4_b()
+            {
+                return '4:-123103.21' === numbase.str( -(((((((1*4 + 2)*4 + 3)*4 +1)*4 +0)*4 +3)*4 +2)*4 +1) /(4*4), 4 );
+            }
+
+            , function str_small_powershift_unbalanced_base_4_c()
+            {
+                return '4:-123103.2' === numbase.str( -((((((1*4 + 2)*4 + 3)*4 +1)*4 +0)*4 +3)*4 +2) /4, 4 );
+            }
+
+            , function str_small_powershift_unbalanced_base_4_d()
+            {
+                return '4:-123103' === numbase.str( -(((((1*4 + 2)*4 + 3)*4 +1)*4 +0)*4 +3), 4 );
+            }
+
+            , function str_small_powershift_unbalanced_base_4_e()
+            {
+                return '4:-1231030' === numbase.str( -(((((1*4 + 2)*4 + 3)*4 +1)*4 +0)*4 +3)*4, 4 );
+            }
+
+            , function str_small_powershift_unbalanced_base_4_f()
+            {
+                return '4:-12310300' === numbase.str( -(((((1*4 + 2)*4 + 3)*4 +1)*4 +0)*4 +3)*4*4, 4 );
+            }
+
+            , function str_small_powershift_unbalanced_base_4_g()
+            {
+                return '4:-123103000' === numbase.str( -(((((1*4 + 2)*4 + 3)*4 +1)*4 +0)*4 +3)*4*4*4, 4 );
+            }
+
+            , function str_small_powershift_unbalanced_base_4_h()
+            {
+                return '4:-123103:10' === numbase.str( -(((((1*4 + 2)*4 + 3)*4 +1)*4 +0)*4 +3)*4*4*4*4, 4 );
+            }
+
+            , function str_small_powershift_unbalanced_base_4_i()
+            {
+                return '4:-123103:11' === numbase.str( -(((((1*4 + 2)*4 + 3)*4 +1)*4 +0)*4 +3)*4*4*4*4*4, 4 );
+            }
+
+ 
+
+
+
+
+
 
             , function basic_parse_base10() { return 1234 === numbase.parse( '1234' ); }
             

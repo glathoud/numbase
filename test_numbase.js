@@ -217,10 +217,154 @@ function test_numbase( /*? DOM node | DOM id string?*/node_or_id )
                 return equal( V_BALFIVE_EXP, numbase.parse( numbase.str( V_BALFIVE_EXP, 'b5' ) ) );
             }
 
+
+            , function str_NO_small_powershift_balanced_base_4()
+            {
+                return 'b4:120_1101_11:_10' === numbase.str( (((1*4 + 2)*4 + 0)*4 -1)*4 + 1 + /*.*/ (0 + (1 - (1 - 1/4)/4)/4 )/4, 'b4' );
+            }
+
+            , function str_small_powershift_balanced_base_4()
+            {
+                return 'b4:120_11.01_1' === numbase.str( (((1*4 + 2)*4 + 0)*4 -1)*4 + 1 + /*.*/ (0 + (1 - 1/4)/4 )/4, 'b4' );
+            }
+
+            , function str_small_powershift_balanced_base_4()
+            {
+                return 'b4:120_11.01' === numbase.str( (((1*4 + 2)*4 + 0)*4 -1)*4 + 1 + /*.*/ (0 + 1/4 )/4, 'b4' );
+            }
+            
+            , function str_small_powershift_balanced_base_4()
+            {
+                return 'b4:120_11.1' === numbase.str( (((1*4 + 2)*4 + 0)*4 -1)*4 + 1 + /*.*/ 1/4, 'b4' );
+            }
+            
+            , function str_small_powershift_balanced_base_4()
+            {
+                return 'b4:120_11' === numbase.str( (((1*4 + 2)*4 + 0)*4 -1)*4 + 1, 'b4' );
+            }
+            
+            , function str_small_powershift_balanced_base_4()
+            {
+                return 'b4:120_110' === numbase.str( ((((1*4 + 2)*4 + 0)*4 -1)*4 + 1)*4, 'b4' );
+            }
+
+            , function str_small_powershift_balanced_base_4()
+            {
+                return 'b4:120_1100' === numbase.str( ((((1*4 + 2)*4 + 0)*4 -1)*4 + 1)*4*4, 'b4' );
+            }
+            
+            , function str_small_powershift_balanced_base_4()
+            {
+                return 'b4:120_21000' === numbase.str( ((((1*4 + 2)*4 + 0)*4 -2)*4 + 1)*4*4*4, 'b4' );
+            }
+            
+            , function str_NO_small_powershift_balanced_base_4()
+            {
+                return 'b4:120_21:10' === numbase.str( ((((1*4 + 2)*4 + 0)*4 -2)*4 + 1)*4*4*4*4, 'b4' );
+            }
             
 
+            , function basic_parse_base10() { return 1234 === numbase.parse( '1234' ); }
             
+            , function basic_parseInt_base10_2() { return 1234 === numbase.parseInt( '1234' ); }
             
+            , function basic_parseInt_base10_3() { return -1234 === numbase.parseInt( '-1234' ); }
+            
+            , function basic_parse_base10_4() { return -1234.5678 === numbase.parse( '-1234.5678' ); }
+
+            
+
+            , function basic_str_zero_1() { return 'b3:0' === numbase.str( 0, 'b3' ); }
+            , function basic_str_zero_2() { return 'b4:0' === numbase.str( 0, 'b4' ); }
+            , function basic_str_zero_3() { return 'b3:0' === numbase.str( -0, 'b3' ); }
+            , function basic_str_zero_4() { return 'b4:0' === numbase.str( -0, 'b4' ); }
+
+            , function basic_str_zero_11() { return '3:0' === numbase.str( 0, '3' ); }
+            , function basic_str_zero_12() { return '4:0' === numbase.str( 0, '4' ); }
+            , function basic_str_zero_13() { return '3:0' === numbase.str( -0, '3' ); }
+            , function basic_str_zero_14() { return '4:0' === numbase.str( -0, '4' ); }
+            , function basic_str_zero_15() { return '10:0' === numbase.str( 0, '10' ); }
+            , function basic_str_zero_16() { return '10:0' === numbase.str( -0, '10' ); }
+            
+            , function basic_str_zero_21() { return '3:0' === numbase.str( 0, 3 ); }
+            , function basic_str_zero_22() { return '4:0' === numbase.str( 0, 4 ); }
+            , function basic_str_zero_23() { return '3:0' === numbase.str( -0, 3 ); }
+            , function basic_str_zero_24() { return '4:0' === numbase.str( -0, 4 ); }
+
+
+
+            // To be safe, also test the specific examples mentionned in the article ./index.html
+
+
+
+
+            , function expl_int_parse_binary() { return equal( 123, numbase.parse( '2:1111011' ) ); }
+
+            , function expl_int_parseInt_binary() { return equal( 123, numbase.parseInt( '1111011', 2 ) ); }
+
+            , function expl_int_parseInt_binary_2() { return equal( 123, numbase.parseInt( '1111011', '2' ) ); }
+            
+            , function expl_int_parse_hexadecimal() { return equal( 123, numbase.parse( '16:7b' ) ); }
+
+            , function expl_int_parseInt_hexadecimal() { return equal( 123, numbase.parseInt( '7b', 16 ) ); }
+
+            , function expl_int_parseInt_hexadecimal_2() { return equal( 123, numbase.parseInt( '7b', '16' ) ); }           
+
+            , function expl_int_parse_balanced_ternary() { return equal( 123, numbase.parse( 'b3:1_1_1_1_10' ) ); }
+
+            , function expl_int_parseInt_balanced_ternary() { return equal( 123, numbase.parseInt( '1_1_1_1_10', 'b3' ) ); }
+
+
+
+
+            , function expl_real_parse_binary() { return equal( -123.25, numbase.parse( '2:-1111011.01' ) ); }
+
+            , function expl_real_parse_hexadecimal() { return equal( -123.25, numbase.parse( '16:-7b.4' ) ); }
+
+            , function expl_real_parse_balanced_ternary() { return equal( -123.25, numbase.parse( 'b3:_111110_11_11_11_11_11_11_11_11_11_11_11_11_11_11:_100_1' ) ); }
+     
+
+
+            , function expl_int_parse_balanced_ternary_2() { return equal( -25, numbase.parse( 'b3:_101_1' ) ); }
+
+            , function expl_int_parseInt_balanced_ternary_2() { return equal( -25, numbase.parseInt( '_101_1', 'b3' ) ); }
+
+
+
+            , function expl_int_parse_negated_balanced_ternary_2() { return equal( 25, numbase.parse( 'b3:-_101_1' ) ); }
+
+            , function expl_int_parseInt_negated_balanced_ternary_2() { return equal( 25, numbase.parseInt( '-_101_1', 'b3' ) ); }
+
+
+            
+            , function expl_real_parse_balanced_ternary_2() { return equal( -1*3 + 0*1 + 1/3 - 1/(3*3), numbase.parse( 'b3:_10.1_1' ) ); }
+
+            , function expl_real_parse_balanced_ternary_exp() 
+            { 
+                return equal( (-1*3 + 0*1 + 1/3 - 1/(3*3)) * Math.pow( 3, 1*(3*3) - 1*3 + 0 )
+                              , numbase.parse( 'b3:_10.1_1:1_10' ) 
+                            ); 
+            }
+
+            
+            , function expl_int_str_balanced_ternary_2() { return 'b3:_101_1' === numbase.str( -25, 'b3' ); }
+            
+            , function expl_real_str_balanced_ternary() 
+            {
+                return numbase.str( -123.25, 'b3' ) === 'b3:_111110_11_11_11_11_11_11_11_11_11_11_11_11_11_11:_100_1';
+            }
+
+
+            , function expl_real_str_balanced_ternary_2() 
+            {
+                return 'b3:_11_11_11_11_11_11_11_11_11_11_11_11_11_11_11_11_11:_1_11_1' === numbase.str( -0.25, 'b3' );
+            }
+
+            , function expl_real_back_and_forth_balanced_ternary_2() 
+            {
+                return equal( -0.25, numbase.parse( numbase.str( -0.25, 'b3' ) ) );
+            }
+
         ];
     }
 

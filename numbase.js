@@ -91,14 +91,14 @@ var numbase;
     {
         var        mo = /^(?:(b?\d+):)?([\+\-]?)(\w*)?(?:\.(\w*)?)?(?::(?:([\+\-]?)(\w+)))?$/.exec( s.toLowerCase() )
         ,           i = 0
-        ,        base = mo[ ++i ]  ||  10  // string e.g. "16" or "b20", or number (e.g. 10, equivalent to "10")
+        ,        base = mo[ ++i ]  ||  '10'  // string e.g. "16" or "b20", or number (e.g. 10, equivalent to "10")
         , global_sign = mo[ ++i ] === '-'  ?  -1  :  +1
         ,    int_part = mo[ ++i ]  ||  '0'
         ,   frac_part = mo[ ++i ]  ||  '0'
         ,    exp_sign = mo[ ++i ] === '-'  ?  -1  :  +1
         ,    exponent = mo[ ++i ]  ||  '0'
         
-        , base_radix = 'number' === typeof base  ?  base  :  base.match( /\d+/ ) | 0
+        , base_radix = base.match( /\d+/ ) | 0
 
         ,  int_number = numbase_parseInt(  int_part, base )
 
@@ -107,7 +107,7 @@ var numbase;
         
         ,  exp_number = numbase_parseInt( exponent, base )
         ,  exp_factor = Math.pow( base_radix, (exp_sign < 0  ?  -exp_number  :  exp_number) )
-       
+        
         ,  abs_value  = (int_number + frac_number) * exp_factor
         ;
         
@@ -126,7 +126,7 @@ var numbase;
 
         var str_base     = 'string' === typeof base
         ,    is_balanced = str_base  &&  'b' === base.charAt( 0 ).toLowerCase()  ||  false
-        ,  base_radix   = str_base  ?  base.match( /\d+/ ) | 0  :  base
+        ,  base_radix    = str_base  ?  base.match( /\d+/ ) | 0  :  base
         ;
         (base_radix  ||  null).toPrecision.call.a;
 
@@ -138,11 +138,15 @@ var numbase;
                 _n_2_digit_arr[ base_n_digit ] = _create_base_n_digit_arr( base_n_digit )
             )
 
-        ,   sign = v < 0  ?  -1  :  +1
         ,   vabs = Math.abs( v )
 
         ,      exp2 = Math.log( vabs ) / Math.log( base_radix )
+        ,    fl_ex = Math.floor( exp2 )
 
+        ,  precision = 1 + Math.ceil( Math.log( _2_POW_BIN_PREC ) / Math.log( base_radix ) )
+        ,   rest_end = vabs / _2_POW_BIN_PREC / 2  // Not using >> because it would automatically switch to the 32-bit JS integer representation
+
+        
         // outputs
         ,  digit_arr
         ,  exp_arr
@@ -153,117 +157,66 @@ var numbase;
             digit_arr = [ '0' ];
             exp_arr   = [];
         }
-        else if (!is_balanced)
+        else 
         {
-            var  precision = 1 + Math.ceil( Math.log( _2_POW_BIN_PREC ) / Math.log( base_radix ) );
-
-            var    rest     = vabs
-            ,      rest_end = rest / _2_POW_BIN_PREC / 2  // Not using >> because it would automatically switch to the 32-bit JS integer representation
-            ,    powershift = 1 + Math.floor( exp2 )
-            ;
-            digit_arr   = sign < 0  ?  [ '-' ]  :  [];
-            
-            for (var i = precision; 
-                 i--  &&  rest >= rest_end;
-                )
+            if (!is_balanced) // Unbalanced base
             {
-                powershift--;
-                var digit_int = (rest / Math.pow( base_radix, powershift )) | 0;
-                if (!(0 <= digit_int  &&  digit_int < base_radix))
-                    null.bug;
-                
-                var digit_str = base_digit_arr[ digit_int ];
-
-                digit_arr.push( digit_str );
-                rest -= digit_int * Math.pow( base_radix, powershift )
+                var     rest = vabs
+                ,       sign = v < 0  ?  -1  :  +1
+                , powershift = 1 + fl_ex
+                ;
+                digit_arr = sign < 0  ?  [ '-' ]  :  [];
+            }
+            else // Balanced base
+            {
+                var        rest = v
+                ,    powershift = 1 + fl_ex + (exp2 > fl_ex + Math.log( base_radix * 0.5 ) / Math.log( base_radix ) + 1e-10)
+                ;
+                digit_arr   = [];
             }
             
-            // For better readability try to avoid small exponents
-
-            if (0 < powershift  &&  powershift < _SMALL_POWERSHIFT)
-            {
-                while( powershift-- )
-                    digit_arr.push( '0' );
-
-                powershift = 0;
-            }
-            else if (-_SMALL_POWERSHIFT < powershift  &&  powershift < 0)
-            {
-                while (digit_arr.length < Math.abs( powershift ))
-                    digit_arr.unshift( '0' );
-
-                digit_arr.splice( powershift, 0, '.' );
-
-                powershift = 0;
-            }
-            
-
-            // Also the exponent `powershift` is converted to the desired base
-
-            var powershift_sign = powershift < 0  ?  -1  :  +1
-            ,   powershift_rest = Math.abs( powershift )
-            ;
-            exp_arr = powershift_sign < 0  ?  [ '-' ]  :  [];
-            
-            if (powershift_rest !== 0)
-            {
-                var powershift_powershift = 1 + Math.floor( Math.log( powershift_rest ) / Math.log( base_radix ));
-                while( powershift_powershift-- )
-                {
-                    var        tmp_value      = Math.pow( base_radix, powershift_powershift )
-                    ,     exponent_digit_int  = (powershift_rest / tmp_value) | 0
-                    ,     exponent_digit_str  = base_digit_arr[ exponent_digit_int ]
-                    ;
-                    exp_arr.push( exponent_digit_str );
-                    powershift_rest -= exponent_digit_int * tmp_value;
-                }
-            }
-            
-        }
-        else
-        {
-            // Unbalanced base
-
-            var  precision = 1 + Math.ceil( Math.log( _2_POW_BIN_PREC ) / Math.log( base_radix ) );
-         
-            var    rest     = v
-            ,      rest_end = Math.abs( rest ) / _2_POW_BIN_PREC / 2  // Not using >> because it would automatically switch to the 32-bit JS integer representation
-        
-            ,    fl_ex = Math.floor( exp2 )
-            ,    powershift = 1 + fl_ex + (exp2 > fl_ex + Math.log( base_radix * 0.5 ) / Math.log( base_radix ) + 1e-10)
-            ,   digit_arr   = []
-            ;
             
             for (var i = precision; 
                  i--  &&  Math.abs( rest ) >= rest_end;
                 )
             {
                 powershift--;
-                
+
                 var tmp_value = Math.pow( base_radix, powershift );
                 
-                var rest_sign = rest < 0  ?  -1  :  +1
-                ,   rest_abs = Math.abs( rest )
+                if (!is_balanced) // Unbalanced base
+                {
+                    var digit_int = (rest / tmp_value) | 0;
+                    if (!(0 <= digit_int  &&  digit_int < base_radix))
+                        null.bug;
+                    
+                    var digit_str = base_digit_arr[ digit_int ];
+                }
+                else  // Balanced base
+                {
+                    var rest_sign = rest < 0  ?  -1  :  +1
+                    ,   rest_abs = Math.abs( rest )
+                    
+                    ,  digit_int = tmp_value > rest_abs  &&  rest_abs > tmp_value / 2 * (1 - 1e-10) 
+                        ?  rest_sign 
+                        :  rest_sign * Math.round( rest_abs / tmp_value )
+                    ;
+                    if (!(-base_radix <= digit_int  &&  digit_int < base_radix))
+                        null.bug;
+                    
+                    var digit_sign = digit_int < 0  ?  -1  :  +1
+                    ,   digit_uint = Math.abs( digit_int )
+                    ,   digit_ustr = base_digit_arr[ digit_uint ]
+                    ;
+                    (digit_ustr  ||  null).substring.call.a;
+                    
+                    var digit_str = (digit_sign < 0  ?  '_'  :  '') + digit_ustr;
+                }
                 
-                ,  digit_int = tmp_value > rest_abs  &&  rest_abs > tmp_value / 2 * (1 - 1e-10) 
-                    ?  rest_sign 
-                    :  rest_sign * Math.round( rest_abs / tmp_value )
-                ;
-                if (!(-base_radix <= digit_int  &&  digit_int < base_radix))
-                    null.bug;
-                
-                var digit_sign = digit_int < 0  ?  -1  :  +1
-                ,   digit_uint = Math.abs( digit_int )
-                ,   digit_ustr = base_digit_arr[ digit_uint ]
-                ;
-                (digit_ustr  ||  null).substring.call.a;
-                
-                var digit_str = (digit_sign < 0  ?  '_'  :  '') + digit_ustr;
-
                 digit_arr.push( digit_str );
-                rest -= digit_int * tmp_value;
+                rest -= digit_int * tmp_value
             }
-      
+            
             // For better readability try to avoid small exponents
 
             if (0 < powershift  &&  powershift < _SMALL_POWERSHIFT)
@@ -282,47 +235,82 @@ var numbase;
 
                 powershift = 0;
             }
-
+            
 
             // Also the exponent `powershift` is converted to the desired base
 
-            var powershift_rest = powershift
-            ,   exp_arr = []
-            ;
+            if (!is_balanced)  // Unbalanced base
+            {
+                var powershift_sign = powershift < 0  ?  -1  :  +1
+                ,   powershift_rest = Math.abs( powershift )
+                ;
+                exp_arr = powershift_sign < 0  ?  [ '-' ]  :  [];
+            }
+            else   // Balanced base
+            {
+                var powershift_rest = powershift;
+                exp_arr = [];
+            }
+            
             
             if (powershift_rest !== 0)
             {
-                var powershift_exp2 = Math.log( Math.abs( powershift_rest ) ) / Math.log( base_radix )
-                ,   powershift_fl_ex = Math.floor( powershift_exp2 )
-                ,   powershift_powershift = 1 + powershift_fl_ex + (powershift_exp2 > powershift_fl_ex +  Math.log( base_radix * 0.5 ) / Math.log( base_radix ) + 1e-10)
-                ;
+                if (!is_balanced)
+                {
+                    var powershift_powershift = 1 + Math.floor( Math.log( powershift_rest ) / Math.log( base_radix ));
+                }
+                else
+                {
+                    var powershift_exp2 = Math.log( Math.abs( powershift_rest ) ) / Math.log( base_radix )
+                    ,   powershift_fl_ex = Math.floor( powershift_exp2 )
+                    ,   powershift_powershift = 1 + powershift_fl_ex + (powershift_exp2 > powershift_fl_ex +  Math.log( base_radix * 0.5 ) / Math.log( base_radix ) + 1e-10)
+                    ;
+                }
+                
                 while( powershift_powershift-- )
                 {
                     var        tmp_value      = Math.pow( base_radix, powershift_powershift )
 
-                    , p_rest_sign = powershift_rest < 0  ?  -1  :  +1
-                    , p_rest_abs  = Math.abs( powershift_rest )
+                    if (!is_balanced)
+                    {
+                        var   exponent_digit_int  = (powershift_rest / tmp_value) | 0;
+                        
+                        if (!(0 <= exponent_digit_int  &&  exponent_digit_int <= base_radix))
+                            null.bug;
+                     
 
-                    ,     exponent_digit_int  = tmp_value > p_rest_abs  &&  p_rest_abs > tmp_value / 2 * (1 - 1e-10)
-                        ?  p_rest_sign
-                        :  p_rest_sign * Math.round( p_rest_abs / tmp_value )
-                    ;
-                    if (!(-base_radix <= exponent_digit_int  &&  exponent_digit_int <= base_radix))
-                        null.bug;
+                        var exponent_digit_str  = base_digit_arr[ exponent_digit_int ];
+                        exp_arr.push( exponent_digit_str );
+                        powershift_rest -= exponent_digit_int * tmp_value;
+                    }
                     
-                    var e_digit_sign = exponent_digit_int < 0  ?  -1  :  +1
-                    ,   e_digit_uint = Math.abs( exponent_digit_int )
-                    ,   e_digit_ustr = base_digit_arr[ e_digit_uint ]
-                    ;
-                    (e_digit_ustr  ||  null).substring.call.a;
-                    
-                    var e_digit_str = (e_digit_sign < 0  ?  '_'  :  '') + e_digit_ustr;
-                    
-                    exp_arr.push( e_digit_str );
-                    powershift_rest -= exponent_digit_int * tmp_value;
-                }
+                    else
+                    {
+                        var p_rest_sign = powershift_rest < 0  ?  -1  :  +1
+                        , p_rest_abs  = Math.abs( powershift_rest )
+
+                        ,     exponent_digit_int  = tmp_value > p_rest_abs  &&  p_rest_abs > tmp_value / 2 * (1 - 1e-10)
+                            ?  p_rest_sign
+                            :  p_rest_sign * Math.round( p_rest_abs / tmp_value )
+                        ;
+                        if (!(-base_radix <= exponent_digit_int  &&  exponent_digit_int <= base_radix))
+                            null.bug;
+                        
+                        var e_digit_sign = exponent_digit_int < 0  ?  -1  :  +1
+                        ,   e_digit_uint = Math.abs( exponent_digit_int )
+                        ,   e_digit_ustr = base_digit_arr[ e_digit_uint ]
+                        ;
+                        (e_digit_ustr  ||  null).substring.call.a;
+                        
+                        var e_digit_str = (e_digit_sign < 0  ?  '_'  :  '') + e_digit_ustr;
+                        
+                        exp_arr.push( e_digit_str );
+                        powershift_rest -= exponent_digit_int * tmp_value;
+
+                    }
+                } 
             }
-
+            
         }
 
         return base + ':' + digit_arr.join( '' ) + (exp_arr  &&  exp_arr.length  ?  ':' + exp_arr.join( '' )  :  '');

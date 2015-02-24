@@ -17,7 +17,9 @@ code { font-size: 111%; }
 .happy { color : green }
 .sad { color : red }
 
-@media print { .anchor { visibility : hidden; } }
+.interactive-input[name="string-value"] { min-width: 350px; }
+
+@media print { .noprint { visibility : hidden; } }
     </style>
   </head>
   <body>
@@ -51,7 +53,13 @@ function ()
     , h_rArrow  = yak.html( '&nbsp;&rArr;&nbsp;' )
     , h_lrarrow = yak.html( '&nbsp;&lrarr;&nbsp;' )
     , h_rarrow  = yak.html( '&nbsp;&rarr;&nbsp;' )
+
+    ,     d = document
+    , gEBCN = 'getElementsByClassName'
+    ,    aE = 'activeElement'
     ;
+
+    setTimeout( setup_interactive_area, 0 );
 
     return [
 
@@ -84,12 +92,31 @@ function ()
         , { blockquote : [ { code : expl_real }, h_lrarrow, { code : '"' + numbase.str( expl_real, 16 ) + '"' }, h_rarrow, ynh_str( expl_real, 16 ), ' (hexadecimal)' ] }
         , { blockquote : [ { code : expl_real }, h_lrarrow, { code : '"' + numbase.str( expl_real, 'b3' ) + '"' }, h_rarrow, ynh_str( expl_real, 'b3' ), ' (balanced ternary, ', ynh( '_100_1' ) , ' is the exponent)' ] }
 
-        , {p : [
+        , { p : [
              "Inspiration: "
             , third_base_link
             , ", a column from Brian Hayes published in the November-December 2001 issue of American Scientist."
         ] }
         
+        , { 'div class="interactive-area-container noprint" style="visibility: hidden"' : [
+
+            { p : 'Interactive area:' }
+
+            , { 'form name="interactive-area"' : [
+                
+                { 'input type="number" name="decimal-value" value="-123.25" class="interactive-input"' : null }
+                
+                , h_lrarrow
+                
+                , { 'input type="text" name="string-value" value="b4:" class="interactive-input"' : null }
+                
+                , h_rarrow
+                
+                , { 'span class="output"' : '' }
+            ]}
+
+        ]}
+
         // --------------------------------------------------
 
         , with_anchor( 'h2', 'Bases and digits' )
@@ -348,6 +375,7 @@ function ()
 
         , with_anchor( 'h2', 'Details' )
 
+        
         , with_anchor( 'h4', 'Rounding in balanced odd bases' )
 
         , { p : [
@@ -360,6 +388,7 @@ function ()
         
         , { p : ynh( '_101_1.10_1' ) }
 
+        
         , with_anchor( 'h4', 'Rounding in balanced even bases' )
 
         , { p : [ 'In balanced even bases, rounding works as well by removing the last digit'
@@ -379,6 +408,16 @@ function ()
         , { p : [ ynh( '2._12' ), h_rarrow, ynh( '2._1' ), ' (' , ynh( '_2' ), ' IS a middle digit ', h_rArrow, 'round up ', h_rArrow, 'happens to be like truncation in this case.)' ] }
 
         , { p : [ ynh( '2._1_2' ), h_rarrow, ynh( '2._2' ), ' (' , ynh( '_2' ), '  IS a middle digit ', h_rArrow, 'round up)' ] }
+
+
+        , with_anchor( 'h4', 'Why underline?' )
+
+        , { p : [
+
+            'I chose to underline the negative digits e.g. (', ynh( '_2' ), ') because the HTML layout was easier than with overline '
+            , h_ndash, ' overline would require higher line heights to be readable. ' 
+
+        ]}
 
         // --------------------------------------------------
 
@@ -448,7 +487,7 @@ function ()
                 content
                 , h_nbsp
                 , yak.o(
-                    'a href="#' + anchor_id + '" class="anchor"'
+                    'a href="#' + anchor_id + '" class="anchor noprint"'
                     , '#'
                 )
             ]
@@ -504,6 +543,129 @@ function ()
         }
     }
 
+
+    function setup_interactive_area()
+    {
+        var contNode = d[ gEBCN ]( 'interactive-area-container' )[ 0 ]
+        
+        ,   form     = d.forms[ 'interactive-area' ]
+        ;
+        
+        if (contNode  &&  form)
+        {
+            var decimal  = form.elements[ 'decimal-value' ]
+            ,   string   = form.elements[ 'string-value' ]
+            ,   output   = form[ gEBCN ]( 'output' )[ 0 ]
+            ;
+            
+            setInterval( update_interactive_area, 123 );
+            update_interactive_area();
+            contNode.style.visibility = '';
+        }
+
+        // --- Details
+        
+        var _last_decimal_value
+        ,   _last_string_value
+        ;
+        function update_interactive_area()
+        {
+            // Read
+            
+            var decimal_value  = decimal.value
+            ,    string_value  =  string.value
+            ,    output_html   =  output.innerHTML
+
+            // Decide
+
+            , new_decimal_value = decimal_value
+            ,  new_string_value =  string_value
+
+            ,  new_output_html = output_html
+            ,          success = null
+            ;
+            if (decimal_value != null  &&  decimal_value !== _last_decimal_value  &&  d[ aE ] !== string)
+            {
+                success = false;
+                try 
+                {
+                    var x = parseFloat( decimal_value );
+                    try 
+                    {
+                        var base = string_value.split( ':' )[ 0 ]
+                        ,   base_radix = parseInt( 
+                                /^\d+$/.test( base )
+                                ?  base
+                                :  base.match( /^b(\d+)$/ )[ 1 ]
+                            , 10
+                        )
+                        ;
+                        
+                        try
+                        {
+                            new_string_value = numbase.str( decimal_value, base );
+                            success = true;
+                        }
+                        catch (e)
+                        {
+                            new_string_value = new_string_value.split( ':' )[ 0 ] + ':<error thrown by numbase.str>';
+                        }
+
+                        
+                    }
+                    catch (e)
+                    {
+                        new_string_value = new_string_value.split( ':' )[ 0 ] + ':<error: coult not extract target base>'
+                    }
+                }
+                catch (e)
+                {
+                    new_string_value = new_string_value.split( ':' )[ 0 ] + ':<error: could not parse decimal value from "' + decimal_value + '">';
+                }
+                
+            }
+            else if (string_value  &&  string_value !== _last_string_value  &&  d[ aE ] !== string)
+            {
+                success = false;
+                try
+                {
+                    new_decimal_value = '' + numbase.parse( string_value );
+                    success = true;
+                }
+                catch (e)
+                {
+                    new_decimal_value = '<error: thrown by numbase.parse:> ' + e;
+                }                
+            }
+
+            if (success === false)
+                new_output_html = '';
+
+            else if (success === true)
+                new_output_html = numbase.html( new_string_value ).join( '' );
+                
+
+            // Write
+
+            if (new_decimal_value !== decimal_value)
+                decimal.value = new_decimal_value;
+
+            if (new_string_value !== string_value)
+                string.value = new_string_value;
+
+            if (new_output_html !== output_html)
+                output.innerHTML = new_output_html;
+
+            // Remember
+
+            if (success)
+            {
+                _last_decimal_value = new_decimal_value;
+                _last_string_value  = new_string_value;
+            }
+        }
+        
+    }
 
 }
     </script>

@@ -35,39 +35,16 @@ var numbase;
         }
     }
 
-    var _n_2_digit_arr = {}
-    ,   _n_2_digit_rx  = {}
-    ;
     function numbase_parseInt( /*string e.g. "-_1_a2_3"*/sInt, /*?string | number?  default 10*/base )
     {
-        base != null  ||  (base = 10);
+        var bi = _numbase_get_baseinfo( base )
 
-        var str_base     = 'string' === typeof base
-        ,    is_balanced = str_base  &&  'b' === base.charAt( 0 ).toLowerCase()  ||  false
-        ,  base_radix   = str_base  ?  base.match( /\d+/ ) | 0  :  base
-        ;
-        (base_radix  ||  null).toPrecision.call.a;
-
-        var      mo = sInt.match( /^(\+|-)?(.*)$/ )
+        , base_radix     = bi.base_radix
+        , base_digit_arr = bi.base_digit_arr
+        , base_digit_rx  = bi.base_digit_rx
+        
+        ,        mo = sInt.match( /^(\+|-)?(.*)$/ )
         ,  pre_sign = mo[ 1 ] === '-'  ?  -1  :  +1
-        
-        , base_n_digit = is_balanced  ?  1 + (base_radix >> 1)  :  base_radix
-
-        , base_digit_arr = base_n_digit in _n_2_digit_arr
-            ?  _n_2_digit_arr[ base_n_digit ]
-            :  (
-                _n_2_digit_arr[ base_n_digit ] = _create_base_n_digit_arr( base_n_digit )
-            )
-
-        , base_digit_rx = base_n_digit in _n_2_digit_rx  
-            ?  _n_2_digit_rx[ base_n_digit ]
-            :  (_n_2_digit_rx[ base_n_digit ] = new RegExp
-                ( 
-                    '_?[' + base_digit_arr + ']'
-                    , 'g' 
-                )
-               )
-        
         , digit_arr = mo[ 2 ].match( base_digit_rx )
 
         , number = 0
@@ -85,6 +62,7 @@ var numbase;
         return pre_sign * number;
 
     }
+
     
 
     function numbase_parse( /*string e.g. "b20:-_1_a2_3._45_6_34_a_e:-_242a_a" */s )
@@ -111,7 +89,7 @@ var numbase;
         ,  abs_value  = (int_number + frac_number) * exp_factor
         ;
         
-        return global_sign < 0  ?  -abs_value  :  abs_value
+        return global_sign < 0  ?  -abs_value  :  abs_value;
     }
 
 
@@ -122,100 +100,31 @@ var numbase;
     // can be fed into `numbase.parse()` to obtained another number
     // `v2` very close to the original number `v` (rounding errors).
     {
-        // xxx need to refactor, esp. to factor the common parts where reasonable
+        // Inputs
 
-        var str_base     = 'string' === typeof base
-        ,    is_balanced = str_base  &&  'b' === base.charAt( 0 ).toLowerCase()  ||  false
-        ,  base_radix    = str_base  ?  base.match( /\d+/ ) | 0  :  base
-        ;
-        (base_radix  ||  null).toPrecision.call.a;
-
-        var    base_n_digit = is_balanced  ?  1 + (base_radix >> 1)  :  base_radix
-
-        ,    base_digit_arr = base_n_digit in _n_2_digit_arr
-            ?  _n_2_digit_arr[ base_n_digit ]
-            :  (
-                _n_2_digit_arr[ base_n_digit ] = _create_base_n_digit_arr( base_n_digit )
-            )
-
-        ,   vabs = Math.abs( v )
-
-        ,      exp2 = Math.log( vabs ) / Math.log( base_radix )
-        ,    fl_ex = Math.floor( exp2 )
-
-        ,  precision = 1 + Math.ceil( Math.log( _2_POW_BIN_PREC ) / Math.log( base_radix ) )
-        ,   rest_end = vabs / _2_POW_BIN_PREC / 2  // Not using >> because it would automatically switch to the 32-bit JS integer representation
-
+        // Outputs
         
-        // outputs
-        ,  digit_arr
-        ,  exp_arr
+        var digit_arr
+        ,   exp_digit_arr
         ;
         
         if (v === 0)
         {
             digit_arr = [ '0' ];
-            exp_arr   = [];
+            exp_digit_arr   = [];
         }
         else 
         {
-            if (!is_balanced) // Unbalanced base
-            {
-                var     rest = vabs
-                ,       sign = v < 0  ?  -1  :  +1
-                , powershift = 1 + fl_ex
-                ;
-                digit_arr = sign < 0  ?  [ '-' ]  :  [];
-            }
-            else // Balanced base
-            {
-                var        rest = v
-                ,    powershift = 1 + fl_ex + (exp2 > fl_ex + Math.log( base_radix * 0.5 ) / Math.log( base_radix ) + 1e-10)
-                ;
-                digit_arr   = [];
-            }
-            
-            
-            for (var i = precision; 
-                 i--  &&  Math.abs( rest ) >= rest_end;
-                )
-            {
-                powershift--;
-
-                var tmp_value = Math.pow( base_radix, powershift );
-                
-                if (!is_balanced) // Unbalanced base
-                {
-                    var digit_int = (rest / tmp_value) | 0;
-                    if (!(0 <= digit_int  &&  digit_int < base_radix))
-                        null.bug;
-                    
-                    var digit_str = base_digit_arr[ digit_int ];
+            var d_output = _numbase_encode(
+                { 
+                    exponent : false
+                    , v      : v
+                    , base   : base
                 }
-                else  // Balanced base
-                {
-                    var rest_sign = rest < 0  ?  -1  :  +1
-                    ,   rest_abs = Math.abs( rest )
-                    
-                    ,  digit_int = tmp_value > rest_abs  &&  rest_abs > tmp_value / 2 * (1 - 1e-10) 
-                        ?  rest_sign 
-                        :  rest_sign * Math.round( rest_abs / tmp_value )
-                    ;
-                    if (!(-base_radix <= digit_int  &&  digit_int < base_radix))
-                        null.bug;
-                    
-                    var digit_sign = digit_int < 0  ?  -1  :  +1
-                    ,   digit_uint = Math.abs( digit_int )
-                    ,   digit_ustr = base_digit_arr[ digit_uint ]
-                    ;
-                    (digit_ustr  ||  null).substring.call.a;
-                    
-                    var digit_str = (digit_sign < 0  ?  '_'  :  '') + digit_ustr;
-                }
-                
-                digit_arr.push( digit_str );
-                rest -= digit_int * tmp_value
-            }
+            )
+            , powershift = d_output.powershift
+            ;
+            digit_arr = d_output.digit_arr;
             
             // For better readability try to avoid small exponents
 
@@ -236,84 +145,23 @@ var numbase;
                 powershift = 0;
             }
             
-
             // Also the exponent `powershift` is converted to the desired base
 
-            if (!is_balanced)  // Unbalanced base
-            {
-                var powershift_sign = powershift < 0  ?  -1  :  +1
-                ,   powershift_rest = Math.abs( powershift )
-                ;
-                exp_arr = powershift_sign < 0  ?  [ '-' ]  :  [];
-            }
-            else   // Balanced base
-            {
-                var powershift_rest = powershift;
-                exp_arr = [];
-            }
-            
-            
-            if (powershift_rest !== 0)
-            {
-                if (!is_balanced)
-                {
-                    var powershift_powershift = 1 + Math.floor( Math.log( powershift_rest ) / Math.log( base_radix ));
-                }
-                else
-                {
-                    var powershift_exp2 = Math.log( Math.abs( powershift_rest ) ) / Math.log( base_radix )
-                    ,   powershift_fl_ex = Math.floor( powershift_exp2 )
-                    ,   powershift_powershift = 1 + powershift_fl_ex + (powershift_exp2 > powershift_fl_ex +  Math.log( base_radix * 0.5 ) / Math.log( base_radix ) + 1e-10)
-                    ;
-                }
-                
-                while( powershift_powershift-- )
-                {
-                    var        tmp_value      = Math.pow( base_radix, powershift_powershift )
+            exp_digit_arr = powershift === 0
 
-                    if (!is_balanced)
+                ?  []
+
+                :  _numbase_encode( 
                     {
-                        var   exponent_digit_int  = (powershift_rest / tmp_value) | 0;
-                        
-                        if (!(0 <= exponent_digit_int  &&  exponent_digit_int <= base_radix))
-                            null.bug;
-                     
-
-                        var exponent_digit_str  = base_digit_arr[ exponent_digit_int ];
-                        exp_arr.push( exponent_digit_str );
-                        powershift_rest -= exponent_digit_int * tmp_value;
-                    }
-                    
-                    else
-                    {
-                        var p_rest_sign = powershift_rest < 0  ?  -1  :  +1
-                        , p_rest_abs  = Math.abs( powershift_rest )
-
-                        ,     exponent_digit_int  = tmp_value > p_rest_abs  &&  p_rest_abs > tmp_value / 2 * (1 - 1e-10)
-                            ?  p_rest_sign
-                            :  p_rest_sign * Math.round( p_rest_abs / tmp_value )
-                        ;
-                        if (!(-base_radix <= exponent_digit_int  &&  exponent_digit_int <= base_radix))
-                            null.bug;
-                        
-                        var e_digit_sign = exponent_digit_int < 0  ?  -1  :  +1
-                        ,   e_digit_uint = Math.abs( exponent_digit_int )
-                        ,   e_digit_ustr = base_digit_arr[ e_digit_uint ]
-                        ;
-                        (e_digit_ustr  ||  null).substring.call.a;
-                        
-                        var e_digit_str = (e_digit_sign < 0  ?  '_'  :  '') + e_digit_ustr;
-                        
-                        exp_arr.push( e_digit_str );
-                        powershift_rest -= exponent_digit_int * tmp_value;
-
-                    }
-                } 
-            }
-            
+                        exponent : true
+                        , v      : powershift
+                        , base   : base
+                    } 
+                ).digit_arr
+            ;
         }
 
-        return base + ':' + digit_arr.join( '' ) + (exp_arr  &&  exp_arr.length  ?  ':' + exp_arr.join( '' )  :  '');
+        return base + ':' + digit_arr.join( '' ) + (exp_digit_arr  &&  exp_digit_arr.length  ?  ':' + exp_digit_arr.join( '' )  :  '');
     }
 
     // -------
@@ -328,5 +176,160 @@ var numbase;
     {
         return i < 10  ?  '' + i  :  String.fromCharCode( 'a'.charCodeAt( 0 ) + i - 10 );
     }
-    
+
+    function _numbase_encode( input ) 
+    {
+        // -- Input: base
+
+        var base = input.base;
+
+        var str_base       = 'string' === typeof base
+        ,    is_unbalanced = !(str_base  &&  'b' === base.charAt( 0 ).toLowerCase())
+        ,  base_radix      = str_base  ?  base.match( /\d+/ ) | 0  :  base
+        ;
+        (base_radix  ||  null).toPrecision.call.a;
+
+        var    base_n_digit = is_unbalanced  ?  base_radix  :  1 + (base_radix >> 1)
+
+        ,    base_digit_arr = base_n_digit in _n_2_digit_arr
+            ?  _n_2_digit_arr[ base_n_digit ]
+            :  (
+                _n_2_digit_arr[ base_n_digit ] = _create_base_n_digit_arr( base_n_digit )
+            )
+
+        
+        // -- Other inputs
+
+        ,   exponent = !!input.exponent  // Slight differences
+
+        ,   v    = input.v
+        ,   vabs = Math.abs( v )
+        
+        // `v_end`: Not using >> because it would automatically switch to the 32-bit JS integer representation
+        , v_end = exponent  ?  null  :  (Math.abs( v ) / _2_POW_BIN_PREC / 2)
+
+        ,      exp2 = Math.log( vabs ) / Math.log( base_radix )
+        ,    fl_ex = Math.floor( exp2 )
+
+        // -- Temporary variables
+
+        ,  precision = exponent  ?  null  :  1 + Math.ceil( Math.log( _2_POW_BIN_PREC ) / Math.log( base_radix ) )
+        ,  powershift
+        ,  rest
+
+        // -- Output
+
+        , digit_arr;
+        ;
+        
+        // Go!
+        
+        if (is_unbalanced)
+        {
+            digit_arr  = v < 0  ?  [ '-' ]  :  [];
+            rest       = vabs;
+
+            powershift = 1 + fl_ex;
+        }
+        else
+        {
+            digit_arr  = [];
+            rest       = v;
+
+            powershift = 1 + fl_ex + (
+                exp2 > fl_ex + Math.log( base_radix * 0.5 ) / Math.log( base_radix ) + 1e-10  
+                    ?  1  
+                    :  0
+            );
+        }
+        
+        while (exponent  
+               ?  powershift  
+               :  precision--  &&  Math.abs( rest ) >= v_end
+              )
+        {
+            powershift--;
+            
+            var tmp_value = Math.pow( base_radix, powershift )
+            ,   digit_str
+            ;
+            if (is_unbalanced)
+            {
+                var digit_int = (rest / tmp_value) | 0;
+                if (!(0 <= digit_int  &&  digit_int < base_radix))
+                    null.bug;
+                
+                digit_str = base_digit_arr[ digit_int ];
+            }
+            else
+            {
+                var rest_sign = rest < 0  ?  -1  :  +1
+                ,   rest_abs = Math.abs( rest )
+                
+                ,  digit_int = tmp_value > rest_abs  &&  rest_abs > tmp_value / 2 * (1 - 1e-10) 
+                    ?  rest_sign 
+                    :  rest_sign * Math.round( rest_abs / tmp_value )
+                ;
+                if (!(-base_radix <= digit_int  &&  digit_int < base_radix))
+                    null.bug;
+                
+                var digit_sign = digit_int < 0  ?  -1  :  +1
+                ,   digit_uint = Math.abs( digit_int )
+                ,   digit_ustr = base_digit_arr[ digit_uint ]
+                ;
+                (digit_ustr  ||  null).substring.call.a;
+                
+                digit_str = (digit_sign < 0  ?  '_'  :  '') + digit_ustr;
+            }
+            
+            digit_arr.push( digit_str );
+            rest -= digit_int * tmp_value;
+        }
+
+        return { 
+            digit_arr    : digit_arr 
+            , powershift : exponent  ?  null  :  powershift
+        };
+    }
+
+    var _n_2_digit_arr = {}
+    ,   _n_2_digit_rx  = {}
+    ;
+    function _numbase_get_baseinfo( /*?string | number?  default 10*/base )
+    {
+        base != null  ||  (base = 10);
+
+        var str_base       = 'string' === typeof base
+        ,    is_unbalanced = !(str_base  &&  'b' === base.charAt( 0 ).toLowerCase())
+        ,  base_radix      = str_base  ?  base.match( /\d+/ ) | 0  :  base
+        ;
+        (base_radix  ||  null).toPrecision.call.a;
+
+        var base_n_digit = is_unbalanced  ?  base_radix  :  1 + (base_radix >> 1)
+
+        , base_digit_arr = base_n_digit in _n_2_digit_arr
+            ?  _n_2_digit_arr[ base_n_digit ]
+            :  (
+                _n_2_digit_arr[ base_n_digit ] = _create_base_n_digit_arr( base_n_digit )
+            )
+
+        , base_digit_rx = base_n_digit in _n_2_digit_rx  
+            ?  _n_2_digit_rx[ base_n_digit ]
+            :  (_n_2_digit_rx[ base_n_digit ] = new RegExp
+                ( 
+                    '_?[' + base_digit_arr + ']'
+                    , 'g' 
+                )
+               )
+        ;
+
+        return {
+            is_unbalanced    : is_unbalanced
+            , base_radix     : base_radix
+            , base_digit_arr : base_digit_arr
+            , base_digit_rx  : base_digit_rx
+        };
+        
+    }
+   
 })();

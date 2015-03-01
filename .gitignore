@@ -7,3 +7,6 @@ DIRECTIONS.org
 *.outdir
 *.pyc
 .*.sh
+*.exe
+*.obj
+*.out

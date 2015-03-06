@@ -1,4 +1,6 @@
+import std.algorithm;  // sort   sort!
 import std.conv;    // to!
+import std.math;
 import std.stdio;
 import std.string;  // chomp
 
@@ -16,6 +18,8 @@ void main()
   TInfo!( long ).print();
   TInfo!( ulong ).print();
 
+  TInfoNormal!( float ).print();
+  TInfoNormal!( double ).print();
   TInfoNormal!( idouble ).print();
   TInfoNormal!( cdouble ).print();
 
@@ -41,18 +45,113 @@ void main()
     writeln( "nnn ", nnn );  // now equal to 2^^6 == 64
     
 
-    // block
 
     int iii = 3;
     writeln( "iii ", iii );
-    {
-      int iii = 4;
-      writeln( "iii in block scope ", iii );
-    }
+
+
+    // Shadowing forbidden in D
+    // {
+    //   int iii = 4;
+    //   writeln( "iii in block scope ", iii );
+    // }
     
+    // http://ddili.org/ders/d.en/floating_point.html
+
+    double zero = 0;
+    double infinity = double.infinity;
+
+    writeln("any expression with nan: ", double.nan + 1);
+    writeln("zero / zero            : ", zero / zero);
+    writeln("zero * infinity        : ", zero * infinity);
+    writeln("infinity / infinity    : ", infinity / infinity);
+    writeln("infinity - infinity    : ", infinity - infinity);
+
+    writeln("nan == nan ", double.nan == double.nan);
+    writeln("nan != nan ", double.nan != double.nan);
+    writeln("nan <>= nan ", double.nan <>= double.nan);
+
+    writeln("isNaN(double.nan): ", isNaN(double.nan));
+
+    // precision
+
+    float  f = 0.1234567899123456789912345678991234567899f;
+    double d = 0.1234567899123456789912345678991234567899;
+
+    writeln();
+    writeln("Precision");
+    writeln(  "input:  0.1234567899123456789912345678991234567899");
+    writeln( "output:" );
+    writefln( "float:  %.40g", f );
+    writefln( "double: %.40g", d );
+
+    // overflow
+
+    writeln();
+
+    real value = real.max;
+
+    writeln("Before         : ", value);
+
+    // Multiplying by 1.1 is the same as adding 10%
+    value *= 1.1;
+    writeln("Added 10%      : ", value);
+
+
+    // http://ddili.org/ders/d.en/arrays.html
+
+    writeln();
+    
+    int[10] first = 1;
+    int[10] second = 2;
+    int[] result;
+
+    result = first ~ second;
+    writeln(result.length);     // prints 20
+    writeln(result);
+
+    result ~= first;
+    writeln(result.length);     // prints 30
+    writeln(result);
+
+    int[30] fixed30;
+    fixed30 = result;
+
+    int[] blah = [1,5,3,2,4];
+    sort(blah);
+    writeln();
+    writeln("sorted");
+    writeln(blah);
+    reverse( blah );
+    writeln( "reversed ", blah );
+
+
+    blah = [1,5,3,2,4];
+    sort!("a > b")( blah );
+    writeln();
+    writeln( "sorted, decreasing: ", blah );
+
+
+    // xxx http://ddili.org/ders/d.en/characters.html
+
+    // ------- inputs -------
+
+    // http://ddili.org/ders/d.en/floating_point.html
+
+    float[ 5 ] f_in_arr;
+    for (auto i=f_in_arr.length; i--; )
+      {
+        readf( " %s", &f_in_arr[ i ] );
+      }
+
+    for (auto i=f_in_arr.length; i--; )
+        writeln( i, ": 2times:", f_in_arr[ i ]*2, ", a fifth: ", f_in_arr[ i ]/5);
+
     
 
-  // http://ddili.org/ders/d.en/input.html
+    // http://ddili.org/ders/d.en/input.html
+
+    writeln();
 
     write("How many students are there? ");
     int studentCount;
@@ -123,6 +222,7 @@ template TInfoNormal( T ) {
     stdout.writeln( "Min   : ", T.min_normal );
     writeln( "Max   : ", T.max );
     writeln( "Init  : ", T.init ); 
+    writeln( "Digits : ", T.dig );
     writeln();
   }  
 }

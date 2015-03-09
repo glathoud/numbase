@@ -49,6 +49,7 @@ function ()
 
 
     , h_nbsp    = yak.html( '&nbsp;' )
+    , h_mdash   = yak.html( '&mdash;' )
     , h_ndash   = yak.html( '&ndash;' )
     , h_rArrow  = yak.html( '&nbsp;&rArr;&nbsp;' )
     , h_lrarrow = yak.html( '&nbsp;&lrarr;&nbsp;' )
@@ -365,7 +366,7 @@ function ()
         ]}
 
         , { p : [
-            'I recently (2015) read the ', third_base_link, ' article, which lead me to go one step further: if I was going to investigate an unusual '
+            'I recently (2015) read the ', third_base_link, ' article, which led me to go one step further: if I was going to investigate an unusual '
             , h_ndash, ' at least today ', h_ndash, ' way of counting like base 20, and *not* stop halfway through (like in French), then go for ', { em : 'balanced' }
             , ' base 20. As mentionned above, it has nice properties. Moreover, digits b to k are not needed, which hopefuly means '
             , ' less cognitive load.'
@@ -415,10 +416,56 @@ function ()
         , { p : [
 
             'I chose to underline the negative digits e.g. (', ynh( '_2' ), ') because the HTML layout was easier than with overline '
-            , h_ndash, ' overline would require higher line heights to be readable. ' 
+            , h_ndash, ' overline would require higher line heights to be readable. Probably not enough matter to light up a religious war.' 
 
         ]}
 
+        , with_anchor( 'h4', 'Dividing by hand in balanced bases' )
+
+        , { p : [
+            'In balanced bases, for each digit of the division result, '
+            , { em : 'the intermediary rest can be negative' }
+            , '. Indeed, we are minimizing the '
+            , { em : 'absolute value' },
+            , ' of the intermediary rest.'
+        ]}
+
+        , { p : [
+            'Example: in balanced base 20, let us divide ', ynh( '1_3' ), ' by 6.' ]}
+        
+        , { p : [ 'Each intermediary rest is marked by a right arrow ', h_rarrow
+
+            ,(function () {
+
+                var tde = {td:''}
+                ,   arrow2 = yak.o( 'td colspan=2', h_rarrow )
+                ;
+
+                return { table : { tbody : [
+                                
+                    { tr   : [ tde,  tde,  td_ynh( '1' ), td_ynh( '_3' ), td_rep( 6, '' ), { td : '|' }, td_ynh( '6' ) ] }
+                    , { tr : [ tde,  {td:'-'}, td_ynh( '1' ), td_ynh( '_2' ), td_rep( 6, '' ), { td : '|' }, td_rep( 6, h_mdash ) ] }
+                    , { tr : [ {td:h_rarrow}, tde, td_ynh('0'), td_ynh('_1'), td_rep( 6, '' ), { td : '|' }, td_ynh( '3,_3_77_7...', 'colspan="6"') ] }
+                    , { tr : [ td_rep(3,'')             ,td_ynh('_1')   ,td_ynh('0'), td_rep( 5, '' ), { td : '|' }, ]}
+                    , { tr : [ td_rep(2,'') ,{td:'-'}   ,td_ynh( '_1' ) ,td_ynh( '2' ), td_rep( 5, '' ), { td : '|' },  ] }
+                    , { tr : [ arrow2, tde, td_ynh( '0' )  ,td_ynh( '_2' ), td_rep( 5, '' ), { td : '|' },  ] }
+                    , { tr : [ td_rep(4,'')                 ,td_ynh( '_2' ), td_ynh( '0' ), td_rep( 4, '' ), { td : '|' },  ] }
+                    , { tr : [ td_rep(3,'')      , {td:'-'} ,td_ynh( '_2' ), td_ynh( '_2' ), td_rep( 4, '' ), { td : '|' },  ] }
+                    , { tr : [ arrow2, tde, tde      , td_ynh( '0' ), td_ynh( '2' ), td_rep( 4, '' ), { td : '|' },  ] }
+                    , { tr : [ td_rep(5,'')      , td_ynh( '2' ), td_ynh( '0' ), td_rep( 3, '' ), { td : '|' },  ] }
+                    , { tr : [ td_rep(4,'')  ,{td:'-'}    , td_ynh( '2' ), td_ynh( '2' ), td_rep( 3, '' ), { td : '|' },  ] }
+                    , { tr : [ arrow2, td_rep(3,'') , td_ynh( '0' ), td_ynh( '_2'), td_rep( 3, '' ), { td : '|' }]}
+                    , { tr : [ td_rep(6,'')     , td_ynh( '_2' ), td_ynh( '0' ), td_rep( 2, '' ), { td : '|' },  ] }
+                    , { tr : [ td_rep(5,'')  ,{td:'-'}  , td_ynh( '_2' ), td_ynh( '_2' ), td_rep( 2, '' ), { td : '|' },  ] }
+                    , { tr : [ arrow2, td_rep(4,'')  ,td_ynh( '0' ), td_ynh( '2' ), td_rep( 2, '' ), { td : '|' },  ] }
+                    , { tr : [ td_rep(7,''), ,{td:'...'}, td_rep(2,''), { td : '|' },  ] }
+                    
+                ]}};
+                         
+            })()
+
+        ]}
+        
         // --------------------------------------------------
 
 
@@ -495,6 +542,10 @@ function ()
     }
     
     function ynh( s ) { return yak.html( numbase.html( s ).join( '' ) ); }
+
+    function td_ynh( s, optattr ) { return yak.o( 'td ' + (optattr  ||  ''), ynh( s ) ); }
+
+    function td_rep( n, s ) { return yak.array( n ).map( function () { return { td: s }; } ); }
 
     function ynh_str( s, base ) { return ynh( numbase.str( s, base ) ); }
     

@@ -1,8 +1,11 @@
+// -*- coding: utf-8 -*-  (for emacs)
+
 import std.algorithm;  // sort   sort!
 import std.conv;    // to!
 import std.math;
 import std.stdio;
 import std.string;  // chomp
+import std.uni;
 
 void main()
 {
@@ -132,8 +135,34 @@ void main()
     writeln( "sorted, decreasing: ", blah );
 
 
-    // xxx http://ddili.org/ders/d.en/characters.html
+    // http://ddili.org/ders/d.en/characters.html
 
+    wchar é = 'é';
+    writeln();
+    writeln( é );
+
+    writeln("Résumé preparation: 10.25€");
+    writeln("\x52\&eacute;sum\u00e9 preparation: 10.25\&euro;");
+
+    writeln("Is ğ lowercase? ", isLower('ğ'));
+    writeln("Is Ş lowercase? ", isLower('Ş'));
+
+    writeln("Is İ uppercase? ", isUpper('İ'));
+    writeln("Is ç uppercase? ", isUpper('ç'));
+
+    writeln("Is z alphanumeric? ",       isAlpha('z'));
+    writeln("Is é alphanumeric? ",       isAlpha('é'));
+    writeln("Is \&euro; alphanumeric? ", isAlpha('\&euro;'));
+
+    writeln("Is new-line whitespace? ",  isWhite('\n'));
+    writeln("Is underline whitespace? ", isWhite('_'));
+
+    writeln("The lowercase of Ğ: ", toLower('Ğ'));
+    writeln("The lowercase of İ: ", toLower('İ'));
+
+    writeln("The uppercase of ş: ", toUpper('ş'));
+    writeln("The uppercase of ı: ", toUpper('ı'));
+    
     // ------- inputs -------
 
     // http://ddili.org/ders/d.en/floating_point.html

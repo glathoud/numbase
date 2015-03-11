@@ -1,0 +1,51 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>div100</title>
+    <script type="text/javascript" src="js/yak.js"></script>
+    <script type="text/javascript" src="js/numbase.js"></script>
+    <link rel="stylesheet" type="text/css" href="css/numbase.css">
+  </head>
+  <body>
+    <h1>div100</h1>
+
+    <pre id="output"><code>
+
+    <script type="text/yak.js">
+function ()
+{
+    var  N = 100
+    , arrN = yak.array( N )
+    ,  b20 = 'b20'
+    ,  b20_rx = /b20:/g
+    ;
+    return arrN.map( function ( tmp, i ) {
+
+        return arrN.map( divide_i_per_j ).join( '\n' );
+        
+        function divide_i_per_j( tmp, j )
+        {
+            var ip1 = i+1
+            ,   jp1 = j+1
+            ,     r = ip1/jp1
+            ,   ret = ip1 + ' / ' + jp1 + ' = ' + r
+            ;
+            ret += yak.array( 30-ret.length ).join( ' ' );
+            
+            ret += '     ' + b20 + ': ' + (numbase.str( ip1, b20 ) + ' / ' + numbase.str( jp1, b20 ) + ' = ' + numbase.str( r, b20 )).replace( b20_rx, '' );
+            
+            return ret;
+        }
+
+    }).join( '\n' );
+}
+    </script>
+</code></pre>
+
+    <script type="text/javascript">yak.parse();</script>
+        
+    <script type="text/javascript" src="js/ga.js"></script>    
+
+  </body>
+</html>

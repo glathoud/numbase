@@ -347,6 +347,17 @@ void main()
     sx[0] = 'H';
     writeln(sx);
 
+    string resultx = (sx ~ '.').idup;
+    writeln( resultx );
+
+    writeln();
+    writeln( "\"Résumé\".length ",  "Résumé".length  );
+    writeln( "\"Résumé\"d.length ", "Résumé"d.length );
+
+    dchar[] sd = "Résumé"d.dup;
+    sd[ 1 ] = sd[ 5 ] = 'e';
+    writeln("AFTER: ", sd);
+
     // ------- inputs -------
 
     // http://ddili.org/ders/d.en/floating_point.html

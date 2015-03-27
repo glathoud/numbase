@@ -1,8 +1,10 @@
 // -*- coding: utf-8 -*-  (for emacs)
 
+import core.thread;
 import std.algorithm;  // sort   sort!
 import std.conv;    // to!
 import std.math;
+import std.range;
 import std.stdio;
 import std.string;  // chomp
 import std.uni;
@@ -358,7 +360,211 @@ void main()
     sd[ 1 ] = sd[ 5 ] = 'e';
     writeln("AFTER: ", sd);
 
+
+    // http://ddili.org/ders/d.en/auto_and_typeof.html
+    
+    writeln();
+    writeln("typeof(1.2).stringof: ", typeof(1.2).stringof);  // double
+
+    // http://ddili.org/ders/d.en/ternary.html
+    // The types of the selection expressions must match
+    // 
+    // int count = 12;
+    // writeln((count == 12) ? "dozen" : count); // ← compilation ERROR
+
+    // http://ddili.org/ders/d.en/literals.html
+
+    int totoct = octal!576;
+    writeln();
+    writeln("totoct: ", totoct, ' ', 5*8*8+7*8+6);
+
+
+    writeln(`c:\nurten`);
+    writeln("c:\nurten");
+    
+  // several chars, as long as it ends with a new line
+    writeln();
+    writeln(q"MY_DELIMITER
+first line
+second line
+MY_DELIMITER");
+    
+    auto str = q{int number = 42; ++number;};
+    writeln(str);
+    // infinite loop
+    /*       for (int number = 0; ; ++number) {
+        write("\rNumber: ", number);
+    }
+    */
+    /*
+   for (int number = 0; ; ++number) {
+        write("\rNumber: ", number);
+        stdout.flush();
+        Thread.sleep(10.msecs);
+    }
+   // Flushing the output is normally not necessary as it is flushed automatically before getting to the next line e.g. by writeln, or before reading from stdin. 
+   */
+    
+
+    // http://ddili.org/ders/d.en/formatted_output.html
+
+    writefln( "%1$d (decimal) <=> %1$#x (hexa)", 267 );
+    
+    // http://ddili.org/ders/d.en/aa.html (1.)
+
+    int[string] aabb = [ "aa":123, "bb":456 ];
+
+    writeln();
+    writeln(aabb);
+
+    foreach (string k; aabb.keys)
+      aabb.remove(k);
+    
+    writeln(aabb);
+
+    /*
+Another solution is to assign an empty array:
+
+    string[int] emptyAA;
+    names = emptyAA;
+
+Since the initial value of an array is an empty array anyway, the following technique would achieve the same result:
+
+    names = names.init;
+
+    */
+
+    // http://ddili.org/ders/d.en/aa.html (2.)
+
+    writeln();
+    
+    int[][string] grades;
+
+    /*
+    grades[ "emre" ] = grades.get( "emre", [] ) ~ 90;
+    grades[ "emre" ] = grades.get( "emre", [] ) ~ 85;
+
+     actually D makes even easier, because of the automatic init to an
+     empty array when appending:
+     */
+    
+    grades[ "emre" ] ~= 90;
+    writeln( grades[ "emre" ] );
+    grades[ "emre" ] ~= 85;
+    writeln( grades[ "emre" ] );
+
+    writeln( "multigrades", grades );
+
+    // http://ddili.org/ders/d.en/foreach.html
+
+    writeln();
+
+    foreach (gvalue; grades)
+      writeln( "value: ", gvalue );
+
+    foreach (gvalue; grades.byValue())
+      writeln( "value: ", gvalue );
+
+    foreach (key; grades.byKey())
+      writeln( "key: ", key );
+
+    foreach ( key, gvalue; grades )
+      writeln( "key: ", key, ", value: ", gvalue );
+
+    writeln();
+
+   foreach (number; 10..15) {
+        writeln(number);
+    }
+
+    writeln();
+    {
+      writeln( "    foreach ( c ; \"abcdeéèfgh\" )");
+      size_t intic = 0;
+      writeln( "typeof(intic).stringof: ", typeof(intic).stringof );
+      foreach ( c ; "abcdeéèfgh" )
+        writefln( "% 3d.: %s", intic++, c );
+    }
+
+    writeln();
+    {
+      writeln( "    foreach ( c ; stride(\"abcdeéèfgh\",1) )");
+      auto intic = 0;
+      writeln( "typeof(intic).stringof: ", typeof(intic).stringof );
+      foreach ( c ; stride("abcdeéèfgh",1) )
+        writefln( "% 3d.: %s", intic++, c );
+    }
+
+    writeln();
+    {
+    double[] numbers = [ 1.2, 3.4, 5.6 ];
+    
+    writefln( "Before: %s", numbers );
+    foreach (number; numbers)
+        number *= 2;
+    writefln( "After:  %s", numbers );
+    }
+
+    writeln();
+    {
+    double[] numbers = [ 1.2, 3.4, 5.6 ];
+    
+    writefln( "Before: %s", numbers );
+    foreach (ref number; numbers)      // <<< ref
+        number *= 2;
+    writefln( "After:  %s", numbers );
+    }
+
+    writeln();
+    {
+      auto container = [ 1, 2, 3 ];
+      
+    foreach_reverse (element; container) {
+      writefln("%s ", element);
+    }
+    }
+
+    // Exercise
+
+    {
+      writeln();
+      writeln("Reverse mapping");
+      
+      string[int] names = [ 1 : "one", 7 : "seven", 20 : "twenty" ];
+      int[string] values;
+      foreach (name,value; names)
+        values[ value ] = name;
+
+      writeln( "n2v: ", names );
+      writeln( "v2n: ", values );
+    }
+
+    // read: nomad.so/2013/08/alternative-function-syntax-in-d/
+    
+    // xxx http://nomad.so/2013/07/templates-in-d-explained/
+    
     // ------- inputs -------
+
+    // http://ddili.org/ders/d.en/strings.html   (2.)
+
+    writeln();
+    write( "Enter a line with two 'e's > " );
+    string line_2_e = chomp( readln() );
+    auto first_e = indexOf( line_2_e, 'e' );
+    auto last_e  = lastIndexOf( line_2_e, 'e' );
+    string between_2_e = line_2_e[ first_e .. last_e+1 ];
+    writeln( "> Between the two 'e's: ", between_2_e );
+
+    // http://ddili.org/ders/d.en/strings.html   (1.)
+
+    writeln();
+    write("firstname (lowercase) > " );
+    string firstname = chomp( readln() );
+    write("lastname (lowercase) > " );
+    string lastname = chomp( readln() );
+    
+    string fullname = capitalize( firstname ) ~ ' ' ~ capitalize( lastname );
+    writeln("> fullname: ", fullname );
 
     // http://ddili.org/ders/d.en/floating_point.html
 

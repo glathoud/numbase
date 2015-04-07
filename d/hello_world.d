@@ -541,6 +541,27 @@ Since the initial value of an array is an empty array anyway, the following tech
 
     // read: nomad.so/2013/08/alternative-function-syntax-in-d/
     
+    // http://ddili.org/ders/d.en/enum.html
+
+    {
+      enum NaturalConstant : double { pi = 3.14, e = 2.72 }
+      enum TemperatureUnit : string { C = "Celsius", F = "Fahrenheit" }
+
+      enum secondsPerDay = 60 * 60 * 24;
+      enum totalSeconds  = 31 * secondsPerDay;
+
+      writeln();
+      writefln( "secondsPerDay %1$s %1$d,  totalSeconds %2$s %2$d", secondsPerDay, totalSeconds );
+      writeln();
+      
+      enum Suit { spades, hearts, diamonds, clubs }
+      
+      for (auto suit = Suit.min; suit <= Suit.max; ++suit) {
+        writefln("%s: %d", suit, suit);
+      }
+
+    }
+
     // xxx http://nomad.so/2013/07/templates-in-d-explained/
     
     // ------- inputs -------

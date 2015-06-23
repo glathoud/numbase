@@ -1,6 +1,14 @@
+body { font-family: Verdana,Arial,'Lucida Grande',Sans-Serif;
+margin: auto;
+max-width: 80%;
+text-align: justify;
+}
+#test-result { text-align: left; }
 .toplink { display: inline-block; margin: 0.5em; }
+.anchor { font-size: 85%; }
 code { font-size: 111%; }
 .number-table { text-align: right }
+.number-table td { padding: 3px; }
 .op_table_legend_cell { border : solid 1px black; padding : 1px 3px 1px 2px; }
 .api-entry { border : solid 2px blue; background-color: wheat; margin : 1em; margin-bottom: 0.1em; margin-top: 1.5em;
              padding: 1em; display : inline-block; min-width : 300px; }

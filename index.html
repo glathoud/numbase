@@ -78,7 +78,7 @@ function ()
 
         , { blockquote : [ { code : expl_real }, h_lrarrow, { code : '"' + numbase.str( expl_real, 2 )  + '"' }, h_rarrow, ynh_str( expl_real, 2 ), ' (binary)' ] }
         , { blockquote : [ { code : expl_real }, h_lrarrow, { code : '"' + numbase.str( expl_real, 16 ) + '"' }, h_rarrow, ynh_str( expl_real, 16 ), ' (hexadecimal)' ] }
-        , { blockquote : [ { code : expl_real }, h_lrarrow, { code : '"' + numbase.str( expl_real, 'b3' ) + '"' }, h_rarrow, ynh_str( expl_real, 'b3' ), ' (balanced ternary, ', ynh( '_100_1' ) , ' is the exponent)' ] }
+        , { blockquote : [ { code : expl_real }, h_lrarrow, { 'code style="word-break: break-word;"' : '"' + numbase.str( expl_real, 'b3' ) + '"' }, h_rarrow, { 'span style="word-break: break-word;"' : ynh_str( expl_real, 'b3' ) }, ' (balanced ternary, ', ynh( '_100_1' ) , ' is the exponent)' ] }
 
         , { p : [
              "Inspiration: "

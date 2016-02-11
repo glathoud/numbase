@@ -404,7 +404,7 @@ function ()
             
             , { p : [
                 
-                    'I chose to underline the negative digits e.g. (', ynh( '_2' ), ') because the HTML layout was easier than with overline '
+                    'I chose to underline the negative digits (e.g. ', yak.html( '\x3Cspan style="text-decoration: underline"\x3E2\x3C/span\x3E' ), ') because the HTML layout was easier than with overline '
                 , h_ndash, ' overline would require higher line heights to be readable. Probably not enough matter to light up a religious war.' 
                 
             ]}
@@ -414,7 +414,8 @@ function ()
 
         , { p : [
             
-            'Neither underline nor overline can easily be separated from fraction bars, hence the corner notation.'
+            'Neither underline nor overline can easily be separated from fraction bars, hence the corner notation:'
+            , yak.html( '<span class="numbase-digit numbase-digit-neg">3</span>' )
 
         ]}
 

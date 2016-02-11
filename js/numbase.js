@@ -25,13 +25,19 @@ var numbase;
         if (-1 < ind)
             s = s.slice( ind + 1 );
         
-        return s.match( _NUMBASE_SPLIT_RX ).map( _numbase_signed_digit_2_html );
+        return [ '<span class="numbase-number">' ]
+            .concat( s.match( _NUMBASE_SPLIT_RX ).map( _numbase_signed_digit_2_html ) )
+            .concat( [ '</span>' ] )
+        ;
 
         function _numbase_signed_digit_2_html( /*string*/sd )
         {
-            return sd.length < 2  
-                ?  sd  // positive
-                :  '<span class="numbase-neg-digit">' + sd.charAt( 1 ) + '</span>';  // negative
+            var is_pos = sd.length < 2;
+
+            return '<span class="numbase-digit numbase-digit-' + 
+                (is_pos  ?  'pos'  :  'neg') +
+                '">' + (is_pos  ?  sd  :  sd.charAt( 1 )) + '</span>'
+            ;
         }
     }
 

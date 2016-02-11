@@ -398,12 +398,23 @@ function ()
         , { p : [ ynh( '2._1_2' ), h_rarrow, ynh( '2._2' ), ' (' , ynh( '_2' ), '  IS a middle digit ', h_rArrow, 'round up)' ] }
 
 
-        , with_anchor( 'h4', 'Why underline?' )
+        , { 'div class="deprecated"' : [
+            
+            with_anchor( 'h4', 'Why underline?' )
+            
+            , { p : [
+                
+                    'I chose to underline the negative digits e.g. (', ynh( '_2' ), ') because the HTML layout was easier than with overline '
+                , h_ndash, ' overline would require higher line heights to be readable. Probably not enough matter to light up a religious war.' 
+                
+            ]}
+        ]}
+
+        , with_anchor( 'h4', 'Why those strange corners?' )
 
         , { p : [
-
-            'I chose to underline the negative digits e.g. (', ynh( '_2' ), ') because the HTML layout was easier than with overline '
-            , h_ndash, ' overline would require higher line heights to be readable. Probably not enough matter to light up a religious war.' 
+            
+            'Neither underline nor overline can easily be separated from fraction bars, hence the corner notation.'
 
         ]}
 

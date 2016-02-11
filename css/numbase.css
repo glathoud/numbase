@@ -1,1 +1,14 @@
-.numbase-neg-digit { text-decoration : underline; }
+.numbase-number { 
+    word-break: break-word; 
+    margin : 0.6em 0 0.6em 0;
+    display: inline-block;
+}
+
+.numbase-digit { 
+    border: solid 1px transparent;
+    margin: 1px;
+    padding: 0 2px 0 0;
+}
+.numbase-digit-neg {
+    border-color: black black transparent transparent;
+}

@@ -417,7 +417,7 @@ function test_numbase( /*? DOM node | DOM id string?*/node_or_id )
 
             , function expl_real_str_balanced_ternary_2() 
             {
-                return 'b3:_11_11_11_11_11_11_11_11_11_11_11_11_11_11_11_11_11:_1_11_1' === numbase.str( -0.25, 'b3' );
+                return 'b3:0._11_11_11_11_11_11_11_11_11_11_11_11_11_11_11_11_11' === numbase.str( -0.25, 'b3' );
             }
 
             , function expl_real_back_and_forth_balanced_ternary_2() 

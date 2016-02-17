@@ -71,7 +71,7 @@ var numbase;
 
     
 
-    function numbase_parse( /*string e.g. "b20:-_1_a2_3._45_6_34_a_e:-_242a_a" */s )
+    function numbase_parse( /*string e.g. "b20:-_1_a2_3._45_6_34_a_e:-_2a" */s )
     {
         var        mo = /^(?:(b?\d+):)?([\+\-]?)(\w*)?(?:\.(\w*)?)?(?::(?:([\+\-]?)(\w+)))?$/.exec( s.toLowerCase() )
         ,           i = 0
@@ -131,6 +131,8 @@ var numbase;
             , powershift = d_output.powershift
             ;
             digit_arr = d_output.digit_arr;
+
+            var neg_delta  = powershift < 0  &&  powershift + digit_arr.length;
             
             // For better readability try to avoid small exponents
 
@@ -148,6 +150,16 @@ var numbase;
 
                 digit_arr.splice( powershift, 0, '.' );
 
+                powershift = 0;
+            }
+            else if (neg_delta !== false  &&  -_SMALL_POWERSHIFT < neg_delta  &&  neg_delta <= 0)
+            {
+                while (neg_delta++ < 0)
+                {
+                    digit_arr.unshift( '0' );
+                }
+
+                digit_arr.unshift( '0', '.' );
                 powershift = 0;
             }
             

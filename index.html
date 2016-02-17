@@ -34,6 +34,10 @@ function ()
     , convert_small_value_to_balanced_ternary_string = 'numbase.str( ' + small_decimal_value + ', "b3" )'
     , convert_back_small_value_from_balanced_ternary_string = 'numbase.parse( ' + convert_small_value_to_balanced_ternary_string + ')'
 
+    , small_decimal_value_with_exponent = 1.234e-37
+    , convert_small_value_to_balanced_ternary_string_with_exponent = 'numbase.str( ' + small_decimal_value_with_exponent + ', "b3" )'
+    , convert_back_small_value_from_balanced_ternary_string_with_exponent = 'numbase.parse( ' + convert_small_value_to_balanced_ternary_string_with_exponent + ')'
+
 
     , h_nbsp    = yak.html( '&nbsp;' )
     , h_mdash   = yak.html( '&mdash;' )
@@ -260,22 +264,39 @@ function ()
             ,   v_exp = numbase.parse( s_exp )
 
             ,   v = v_num * Math.pow( 3, v_exp )
+
+            ,   s2 = eval( convert_small_value_to_balanced_ternary_string_with_exponent )
+            ,   s2_arr = s2.split( ':' )
             ;
 
-            return [ 'var small_value_balanced_ternary_string = ' + convert_small_value_to_balanced_ternary_string + ';'
-                     , '// "' + s + '"'
-                     , '// '
-                     , '// where "' + s_arr[ 1 ] + '"'
-                     , '// represents in balanced ternary base the decimal value '
-                     , '// -1 / 3 + 1 / 3^2 - 1 / 3^3 + ... = ' + v_num
-                     , '//'
-                     , '// and the exponent "' + s_arr[ 2 ] + '"'
-                     , '// represents in balanced ternary base the decimal value ' + v_exp
-                     , '//'
-                     , '// so the that the equivalent decimal number is:'
-                     , '//'
-                     , '// ' + v_num + ' * 3^' + v_exp + ' = ' + v
-                   ];
+            return [ 
+                '// First an example without exponent'
+                , 'var small_value_balanced_ternary_string = ' + convert_small_value_to_balanced_ternary_string + ';'
+                , '// "' + s + '"'
+                , '// '
+                , '// where "' + s_arr[ 1 ] + '"'
+                , '// represents in balanced ternary base the decimal value '
+                , '// -1 / 3 + 1 / 3^2 - 1 / 3^3 + ... = ' + v_num
+                , '//'
+                , '// and the exponent is not shown because it is zero.'
+                , ''
+                , ''
+                , '// another example with exponent:'
+                , 'var with_exponent = ' + convert_small_value_to_balanced_ternary_string_with_exponent + ';'
+                , '// "' + eval( convert_small_value_to_balanced_ternary_string_with_exponent ) + '"'
+                , '// '
+                , '// where "' + s2_arr[ 1 ] + '"'
+                , '// represents in balanced ternary base the decimal value '
+                , '// 3^33 - 3^32 + 0 + 0 + 3^30 + 3^29... = ' + numbase.parse( 'b3:' + s2_arr[ 1 ] )
+                , '//'
+                , '// and the exponent value "' + s2_arr[ 2 ] + '"'
+                , '// represents in balanced ternary base the decimal value '
+                , '// -3^4 - 3^3 + 0 - 3 + 1 = ' + numbase.parse( 'b3:' + s2_arr[ 2 ] )
+                , '//'
+                , '// so that the corresponding decimal value is:'
+                , '// (3^33 - 3^32 + 0 + 0 + 3^30 + 3^29...) * 3^(-110)'
+                , numbase.parse( 'b3:' + s2_arr[ 1 ] ) * Math.pow( 3, numbase.parse( 'b3:' + s2_arr[ 2 ] ) )
+            ];
 
 
         })())

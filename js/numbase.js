@@ -24,6 +24,10 @@ var numbase;
         var ind = s.indexOf( ':' );
         if (-1 < ind)
             s = s.slice( ind + 1 );
+
+        var mantexp = s.split( ':' );
+        if (mantexp.length > 1)
+            return numbase_html( mantexp[ 0 ] ).concat( [ ':' ] ).concat( numbase_html( mantexp[ 1 ] ) );
         
         var digit_arr = s.match( _NUMBASE_SPLIT_RX )
 
@@ -38,7 +42,7 @@ var numbase;
         
         if (has_dot)
             for (var i = Math.ceil( right.length / 3 ) * 3; i > 0; i -= 3)
-                if (i < right.length - 1)
+                if (i <= right.length - 1)
                     right.splice( i, 0, ' ' );
 
         return [ '<span class="numbase-number">' ]

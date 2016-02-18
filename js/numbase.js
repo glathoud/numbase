@@ -25,19 +25,41 @@ var numbase;
         if (-1 < ind)
             s = s.slice( ind + 1 );
         
+        var digit_arr = s.match( _NUMBASE_SPLIT_RX )
+
+        ,     dot_ind = digit_arr.indexOf( '.' )
+        ,     has_dot = -1 < dot_ind
+
+        ,        left = has_dot  ?  digit_arr.slice( 0, dot_ind )   :  digit_arr
+        ,       right = has_dot  ?  digit_arr.slice( 1 + dot_ind )  :  []
+        ;
+        for (var i = left.length - 2; i > 0; i-=3)
+            left.splice( i, 0, ' ' );
+        
+        if (has_dot)
+            for (var i = Math.ceil( right.length / 3 ) * 3; i > 0; i -= 3)
+                if (i < right.length - 1)
+                    right.splice( i, 0, ' ' );
+
         return [ '<span class="numbase-number">' ]
-            .concat( s.match( _NUMBASE_SPLIT_RX ).map( _numbase_signed_digit_2_html ) )
+            .concat( left.concat( right  ?  [ '.' ].concat( right )  :  [] ).map( _numbase_signed_digit_2_html ) )
             .concat( [ '</span>' ] )
         ;
 
         function _numbase_signed_digit_2_html( /*string*/sd )
         {
-            var is_pos = sd.length < 2;
+            var is_space = sd === ' '
+            ,     is_pos = sd.length < 2
 
-            return '<span class="numbase-digit numbase-digit-' + 
-                (is_pos  ?  'pos'  :  'neg') +
-                '">' + (is_pos  ?  sd  :  sd.charAt( 1 )) + '</span>'
+            ,       html = is_space  ?  '&nbsp;'
+                :  is_pos  ?  sd  
+                :  sd.charAt( 1 )
+
+            ,   digit_class = is_space  ?  ''
+                :  (' numbase-digit-' + (is_pos  ?  'pos'  :  'neg'))
             ;
+            
+            return '<span class="numbase-digit' + digit_class + '">' + html + '</span>';
         }
     }
 

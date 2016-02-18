@@ -33,7 +33,7 @@ var numbase;
         ,        left = has_dot  ?  digit_arr.slice( 0, dot_ind )   :  digit_arr
         ,       right = has_dot  ?  digit_arr.slice( 1 + dot_ind )  :  []
         ;
-        for (var i = left.length - 2; i > 0; i-=3)
+        for (var i = left.length - 3; i > 0; i-=3)
             left.splice( i, 0, ' ' );
         
         if (has_dot)
@@ -42,7 +42,7 @@ var numbase;
                     right.splice( i, 0, ' ' );
 
         return [ '<span class="numbase-number">' ]
-            .concat( left.concat( right  ?  [ '.' ].concat( right )  :  [] ).map( _numbase_signed_digit_2_html ) )
+            .concat( left.concat( right.length  ?  [ '.' ].concat( right )  :  [] ).map( _numbase_signed_digit_2_html ) )
             .concat( [ '</span>' ] )
         ;
 
@@ -157,7 +157,6 @@ var numbase;
             var neg_delta  = powershift < 0   &&  powershift + digit_arr.length;
             
             // For better readability try to avoid small exponents
-
             if (0 < powershift  &&  powershift < _SMALL_POWERSHIFT)
             {
                 while( powershift-- )
@@ -186,7 +185,7 @@ var numbase;
             }
             else if (neg_delta !== false  &&  0 < neg_delta   &&  neg_delta < _SMALL_POWERSHIFT)
             {
-                digit_arr.splice( 1 + neg_delta, 0, '.' );
+                digit_arr.splice( neg_delta, 0, '.' );
                 powershift = 0;
             }
             

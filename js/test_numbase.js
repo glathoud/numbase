@@ -425,6 +425,37 @@ function test_numbase( /*? DOM node | DOM id string?*/node_or_id )
                 return equal( -0.25, numbase.parse( numbase.str( -0.25, 'b3' ) ) );
             }
 
+            , function back_forth_balanced_base_20_good_number()
+            {
+                var a = 0.8759835795793;
+                return equal( a, numbase.parse( numbase.str( a, 'b20' ) ) );
+            }
+            
+            , function back_forth_balanced_base_20_small_number()
+            {
+                var a = 0.008759835795793;
+                return equal( a, numbase.parse( numbase.str( a, 'b20' ) ) );
+            }
+            
+            , function back_forth_balanced_base_20_very_small_number()
+            {
+                var a = 0.8759835795793e-10;
+                return equal( a, numbase.parse( numbase.str( a, 'b20' ) ) );
+            }
+
+            , function back_forth_balanced_base_20_big_number()
+            {
+                var a = 875.9835795793;
+                return equal( a, numbase.parse( numbase.str( a, 'b20' ) ) );
+            }
+            
+            , function back_forth_balanced_base_20_very_big_number()
+            {
+                var a = 8.759835795793e30;
+                return equal( a, numbase.parse( numbase.str( a, 'b20' ) ) );
+            }
+            
+
         ];
     }
 

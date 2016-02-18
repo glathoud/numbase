@@ -132,7 +132,7 @@ var numbase;
             ;
             digit_arr = d_output.digit_arr;
 
-            var neg_delta  = powershift < 0  &&  powershift + digit_arr.length;
+            var neg_delta  = powershift < 0   &&  powershift + digit_arr.length;
             
             // For better readability try to avoid small exponents
 
@@ -162,6 +162,12 @@ var numbase;
                 digit_arr.unshift( '0', '.' );
                 powershift = 0;
             }
+            else if (neg_delta !== false  &&  0 < neg_delta   &&  neg_delta < _SMALL_POWERSHIFT)
+            {
+                digit_arr.splice( 1 + neg_delta, 0, '.' );
+                powershift = 0;
+            }
+            
             
             // Also the exponent `powershift` is converted to the desired base
 

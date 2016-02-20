@@ -9,6 +9,7 @@ var numbase;
         , parse    : numbase_parse
         , parseInt : numbase_parseInt
         , str      : numbase_str
+        , svgText  : numbase_svgText
     };
     
     // --- Implementation
@@ -19,8 +20,15 @@ var numbase;
     ,    _SMALL_POWERSHIFT = 4
     ;
 
-    function numbase_html( /*string*/s )
+    function numbase_svgText( /*string*/s )
     {
+        return numbase_html( s, 'tspan' );
+    }
+    
+    function numbase_html( /*string*/s, /*?string?*/tagName )
+    {
+        tagName  ||  (tagName = 'span');
+        
         var ind = s.indexOf( ':' );
         if (-1 < ind)
             s = s.slice( ind + 1 );
@@ -45,9 +53,9 @@ var numbase;
                 if (i <= right.length - 1)
                     right.splice( i, 0, ' ' );
 
-        return [ '<span class="numbase-number">' ]
+        return [ '<' + tagName + ' class="numbase-number">' ]
             .concat( left.concat( right.length  ?  [ '.' ].concat( right )  :  [] ).map( _numbase_signed_digit_2_html ) )
-            .concat( [ '</span>' ] )
+            .concat( [ '</' + tagName + '>' ] )
         ;
 
         function _numbase_signed_digit_2_html( /*string*/sd )
@@ -63,7 +71,7 @@ var numbase;
                 :  (' numbase-digit-' + (is_pos  ?  'pos'  :  'neg'))
             ;
             
-            return '<span class="numbase-digit' + digit_class + '">' + html + '</span>';
+            return '<' + tagName + ' class="numbase-digit' + digit_class + '">' + html + '</' + tagName + '>';
         }
     }
 

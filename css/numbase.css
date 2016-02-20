@@ -10,3 +10,7 @@
 .numbase-digit-neg {
     border-color: black black transparent transparent;
 }
+
+tspan.numbase-digit-neg {
+    fill: red;
+}

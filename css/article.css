@@ -21,5 +21,6 @@ code { font-size: 111%; }
 a.with_img { text-align: center; }
 a.with_img:hover { background-color: #abe; }
 a img:hover { opacity: 0.8; }
+.log10circle_small_img { max-width: 30%; }
 
 @media print { .noprint { visibility : hidden; } }

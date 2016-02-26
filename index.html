@@ -488,6 +488,27 @@ function ()
         
         // --------------------------------------------------
 
+        , with_anchor( 'h2', 'You might also like' )
+
+        , { 'p id="also-like"' : [
+            
+            { 'a href="../log10circle"':   { code : 'log10circle' } }
+              , ': circles on paper for quick computer-free calculations: multiplication, division, power, sine, cosine.'
+            ]
+          }
+
+        , { 'div class="text-center"' : [ { png    : 'log10log10_small.png', link : '../log10circle/index.html?n=10' }
+                      ,  { png : 'log10lin_small.png', link : '../log10circle/index.html?n=10&lin=1' }
+                      ,  { png : 'sincos_small.png', link : '../log10circle/sincoscircle.html' }
+                    ]
+                .map( (_) => yak.o( 'a class="with_img" href="../log10circle/' + _.link + '"'
+                                    , yak.o( 'img class="log10circle_small_img" src="' + _.png + '"' )
+                                  )
+                    )
+        }
+
+        // --------------------------------------------------
+
 
         , with_anchor( 'h2', 'Tests' )
 

@@ -3,6 +3,7 @@ margin: auto;
 max-width: 80%;
 text-align: justify;
 }
+.text-center { text-align: center; }
 #test-result { text-align: left; }
 .toplink { display: inline-block; margin: 0.5em; }
 .anchor { font-size: 85%; }
@@ -17,6 +18,8 @@ code { font-size: 111%; }
 
 .deprecated { text-decoration: line-through; }
 .interactive-input[name="string-value"] { min-width: 350px; }
-
+a.with_img { text-align: center; }
+a.with_img:hover { background-color: #abe; }
+a img:hover { opacity: 0.8; }
 
 @media print { .noprint { visibility : hidden; } }
